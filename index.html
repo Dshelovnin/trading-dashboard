@@ -8,9 +8,9 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
 :root {
-  --bg:#0d0d0d; --surface:#141414; --surface2:#1a1a1a; --border:#242424;
-  --accent:#7c6ff7; --accent2:#5b54d6; --green:#22c55e; --red:#ef4444;
-  --yellow:#f59e0b; --text:#f0f0f0; --muted:#555; --muted2:#888;
+  --bg:#080d1a; --surface:#0d1526; --surface2:#111d33; --border:#1a2744;
+  --accent:#4f8ef7; --accent2:#2d6ee0; --green:#22c55e; --red:#ef4444;
+  --yellow:#f59e0b; --text:#e8edf5; --muted:#2a3a5c; --muted2:#6b82a8;
   --mono:'JetBrains Mono',monospace; --sans:'Inter',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -372,41 +372,51 @@ async function callWorker(endpoint, params = {}) {
   return res.json();
 }
 
-// Fetch ALL trades via cursor pagination
+// Fetch ALL 2026 trades using weekly time windows
 async function fetchAllTrades2026() {
-  const all = [];
-  let cursor = '';
-  let page = 0;
-  const MAX_PAGES = 30;
+  const all = new Map(); // deduplicate by orderId
+  const yearStart = new Date('2026-01-01T00:00:00.000Z').getTime();
+  const now = Date.now();
 
-  while (page < MAX_PAGES) {
-    const pct = Math.min(90, Math.round((page / MAX_PAGES) * 90));
-    setProgress(pct, `Загрузка сделок... (${all.length} загружено)`);
-
-    const params = { category: 'linear', limit: 100 };
-    if (cursor) params.cursor = cursor;
-
-    const data = await callWorker('/v5/position/closed-pnl', params);
-    if (data.retCode !== 0) { console.error('Bybit error:', data.retMsg); break; }
-
-    const list = data.result?.list || [];
-    if (list.length === 0) break;
-
-    all.push(...list);
-    cursor = data.result?.nextPageCursor || '';
-    page++;
-
-    if (!cursor) break;
-
-    // Stop if oldest trade in batch is before 2026
-    const oldest = list[list.length - 1];
-    if (oldest && new Date(parseInt(oldest.updatedTime)).getFullYear() < 2026) break;
-
-    await new Promise(r => setTimeout(r, 60));
+  // Build weekly chunks
+  const WEEK = 7 * 24 * 3600 * 1000;
+  const chunks = [];
+  for (let s = yearStart; s < now; s += WEEK) {
+    chunks.push({ start: s, end: Math.min(s + WEEK - 1, now) });
   }
 
-  setProgress(100, `Загружено ${all.length} сделок`);
-  return all;
+  for (let ci = 0; ci < chunks.length; ci++) {
+    const { start, end } = chunks[ci];
+    const pct = Math.round((ci / chunks.length) * 90);
+    const label = new Date(start).toLocaleDateString('ru', { day:'numeric', month:'short' });
+    setProgress(pct, `Загрузка с ${label}... (${all.size} сделок)`);
+
+    let cursor = '';
+    let pageN = 0;
+    while (pageN < 15) {
+      const params = { category: 'linear', limit: 100,
+        startTime: String(start), endTime: String(end) };
+      if (cursor) params.cursor = cursor;
+
+      let data;
+      try { data = await callWorker('/v5/position/closed-pnl', params); }
+      catch(e) { break; }
+
+      if (data.retCode !== 0) break;
+      const list = data.result?.list || [];
+      list.forEach(t => all.set(t.orderId || t.createdTime, t));
+
+      cursor = data.result?.nextPageCursor || '';
+      pageN++;
+      if (!cursor || list.length < 100) break;
+      await new Promise(r => setTimeout(r, 50));
+    }
+    await new Promise(r => setTimeout(r, 80));
+  }
+
+  const result = [...all.values()];
+  setProgress(100, `Загружено ${result.length} сделок`);
+  return result;
 }
 
 function setProgress(pct, text) {
@@ -451,7 +461,7 @@ const f2 = n => (parseFloat(n) >= 0 ? '+' : '') + parseFloat(n).toFixed(2);
 const fUSD = n => '$' + parseFloat(n).toFixed(2);
 
 // ── Monthly forecast ──────────────────────────────────────────────────────────
-function renderMonthly(allCombined) {
+function renderMonthly(allCombined, balance) {
   const rate = MONTHLY_RATE;
   document.getElementById('growth-rate-label').textContent = (1 + rate).toFixed(2);
 
@@ -497,7 +507,12 @@ function renderMonthly(allCombined) {
         const devPct = (dev / planProfit * 100).toFixed(1);
         factCell = `<span class="${fact>=0?'pos':'neg'}">${f2(fact)}</span>`;
         deviationCell = `<span class="${dev>=0?'pos':'neg'}">${f2(dev)} (${dev>=0?'+':''}${devPct}%)</span>`;
-        factEndCell = fUSD(planCap + fact);
+        // For current month use real wallet balance if available
+        if (key === curKey && balance !== null) {
+          factEndCell = fUSD(balance);
+        } else {
+          factEndCell = fUSD(planCap + fact);
+        }
         statusTag = fact >= planProfit
           ? `<span class="tag-ok">✓ Выполнен</span>`
           : `<span class="tag-bad">✗ Не выполнен</span>`;
@@ -511,7 +526,7 @@ function renderMonthly(allCombined) {
         const devPct = (dev / planProfit * 100).toFixed(1);
         factCell = `<span class="${fact>=0?'pos':'neg'}">${f2(fact)}</span>`;
         deviationCell = `<span class="${dev>=0?'pos':'neg'}">${f2(dev)} (${dev>=0?'+':''}${devPct}%)</span>`;
-        factEndCell = fUSD(planCap + fact);
+        factEndCell = balance !== null ? fUSD(balance) : fUSD(planCap + fact);
       }
       statusTag = `<span class="tag-cur">▶ Текущий</span>`;
     } else {
@@ -578,7 +593,7 @@ function renderDashboard(trades, balance, allCombined) {
   const days = Math.max(Object.keys(daily).length, 1);
   const avgD = totalPnl / days;
   const avgT = total ? totalPnl / total : 0;
-  const curCap = balance || (START_CAPITAL + totalPnl);
+  const curCap = balance !== null ? balance : (START_CAPITAL + totalPnl);
 
   document.getElementById('kpi-start').textContent = '$' + START_CAPITAL.toLocaleString();
   document.getElementById('kpi-current').textContent = '$' + curCap.toFixed(0);
@@ -680,7 +695,7 @@ function renderDashboard(trades, balance, allCombined) {
   });
 
   renderTable(trades);
-  renderMonthly(allCombined || [...allTrades, ...manualTrades]);
+  renderMonthly(allCombined || [...allTrades, ...manualTrades], balance);
 
   const excCount = [...excludedIds].filter(id => trades.some(t=>(t.id||t.orderId)===id)).length;
   document.getElementById('excluded-count').textContent = excCount ? `Исключено: ${excCount}` : '';
