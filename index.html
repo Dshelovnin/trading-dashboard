@@ -5,171 +5,274 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trading Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
 :root {
-  --bg:#080d1a; --surface:#0d1526; --surface2:#111d33; --border:#1a2744;
-  --accent:#4f8ef7; --accent2:#2d6ee0; --green:#22c55e; --red:#ef4444;
-  --yellow:#f59e0b; --text:#e8edf5; --muted:#2a3a5c; --muted2:#6b82a8;
-  --mono:'JetBrains Mono',monospace; --sans:'Inter',sans-serif;
+  --bg: #08080f;
+  --surface: #0e0e1c;
+  --surface2: #13132b;
+  --border: #1e1e3a;
+  --border2: #252550;
+  --accent: #5b8fff;
+  --accent-dim: rgba(91,143,255,0.12);
+  --accent-glow: rgba(91,143,255,0.25);
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,0.12);
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.12);
+  --yellow: #f59e0b;
+  --yellow-dim: rgba(245,158,11,0.12);
+  --text: #ffffff;
+  --text2: #a0a0c0;
+  --text3: #505078;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', sans-serif;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 13px; min-height: 100vh; }
 
-.header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
-.logo{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.05em}
-.header-right{display:flex;align-items:center;gap:8px}
-.dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.ts{font-size:11px;color:var(--muted2);font-family:var(--mono)}
-.btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted2);padding:5px 11px;border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:12px;transition:all .15s}
-.btn:hover{border-color:var(--accent);color:var(--accent)}
-.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-.btn.primary:hover{background:var(--accent2)}
-.btn.sm{padding:3px 8px;font-size:11px}
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-.main{padding:14px 20px;max-width:1500px;margin:0 auto}
+/* ── Header ── */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 52px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(8,8,15,0.9);
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: .06em; }
+.logo span { color: var(--text3); }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.live-badge { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text3); font-family: var(--mono); }
+.live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-.config-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;display:none}
-.config-panel.show{display:block}
-.config-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
-.field{flex:1;min-width:120px}.field label{display:block;font-size:11px;color:var(--muted2);margin-bottom:4px}
-.field input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-family:var(--mono);font-size:12px}
-.field input:focus{outline:none;border-color:var(--accent)}
-.sec-title{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+/* ── Buttons ── */
+.btn {
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text2); padding: 6px 12px; border-radius: 6px;
+  cursor: pointer; font-family: var(--sans); font-size: 12px; transition: all .15s;
+  white-space: nowrap;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary:hover { background: #4070ee; }
+.btn.sm { padding: 3px 8px; font-size: 11px; }
+.btn:disabled { opacity: .3; cursor: default; }
 
-.filters{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
-.filter-label{font-size:11px;color:var(--muted2)}
-.fbtn{background:var(--surface);border:1px solid var(--border);color:var(--muted2);padding:4px 10px;border-radius:20px;cursor:pointer;font-size:11px;transition:all .15s;font-family:var(--sans)}
-.fbtn:hover,.fbtn.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.date-range{display:flex;gap:5px;align-items:center;margin-left:auto}
-.date-range input{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:11px;font-family:var(--mono);cursor:pointer}
-.date-range input:focus{outline:none;border-color:var(--accent)}
-.date-sep{color:var(--muted);font-size:11px}
+/* ── Main ── */
+.main { padding: 16px 24px; max-width: 1600px; margin: 0 auto; }
 
-.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
-.kpi-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
-.kpi-val{font-family:var(--mono);font-size:20px;font-weight:600;line-height:1}
-.kpi-val.green{color:var(--green)}.kpi-val.red{color:var(--red)}.kpi-val.purple{color:var(--accent)}
-.kpi-sub{font-size:10px;color:var(--muted2);margin-top:3px;font-family:var(--mono)}
+/* ── Config ── */
+.config-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: none; }
+.config-panel.show { display: block; }
+.config-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.field { flex: 1; min-width: 120px; }
+.field label { display: block; font-size: 11px; color: var(--text3); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .08em; }
+.field input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; color: var(--text); font-family: var(--mono); font-size: 12px; }
+.field input:focus { outline: none; border-color: var(--accent); }
+.sec-title { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 12px; }
 
-.grid-2{display:grid;grid-template-columns:1fr 240px;gap:10px;margin-bottom:10px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
-.card-title{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+/* ── Filters ── */
+.filters { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.filter-label { font-size: 11px; color: var(--text3); margin-right: 2px; }
+.fbtn { background: var(--surface); border: 1px solid var(--border); color: var(--text3); padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 11px; transition: all .15s; font-family: var(--sans); }
+.fbtn:hover { border-color: var(--accent); color: var(--accent); }
+.fbtn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.date-range { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+.date-range input { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 5px 9px; color: var(--text2); font-size: 11px; font-family: var(--mono); cursor: pointer; }
+.date-range input:focus { outline: none; border-color: var(--accent); }
+.date-sep { color: var(--text3); font-size: 11px; }
 
-.stat-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
-.stat-row:last-child{border-bottom:none}
-.stat-row .lbl{color:var(--muted2)}.stat-row .val{font-family:var(--mono);font-weight:500}
+/* ── KPI row ── */
+.kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px; }
+.kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; position: relative; overflow: hidden; }
+.kpi::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0; transition: opacity .3s; }
+.kpi:hover::after { opacity: 1; }
+.kpi-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
+.kpi-val { font-family: var(--mono); font-size: 22px; font-weight: 600; line-height: 1; }
+.kpi-val.blue { color: var(--accent); }
+.kpi-val.green { color: var(--green); }
+.kpi-val.red { color: var(--red); }
+.kpi-sub { font-size: 10px; color: var(--text3); margin-top: 5px; font-family: var(--mono); }
 
-.ls-wrap{display:flex;gap:10px;margin-bottom:10px}
-.ls-block{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
-.ls-type{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
-.ls-count{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1;margin-bottom:2px}
-.ls-count.long{color:var(--green)}.ls-count.short{color:var(--red)}
-.ls-wr{font-size:11px;color:var(--muted2);margin-bottom:10px}
-.ls-nums{display:flex;gap:10px}
-.ls-num .ln{font-size:10px;color:var(--muted2);margin-bottom:2px}
-.ls-num .lv{font-family:var(--mono);font-size:12px;font-weight:600}
+/* ── Long/Short row ── */
+.ls-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.ls-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 20px; }
+.ls-big { font-family: var(--mono); font-size: 36px; font-weight: 700; line-height: 1; min-width: 60px; }
+.ls-big.long { color: var(--green); }
+.ls-big.short { color: var(--red); }
+.ls-info { flex: 1; }
+.ls-title { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+.ls-wr { font-family: var(--mono); font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+.ls-nums { display: flex; gap: 16px; }
+.ls-num .ln { font-size: 10px; color: var(--text3); margin-bottom: 2px; }
+.ls-num .lv { font-family: var(--mono); font-size: 12px; font-weight: 500; }
 
-/* Monthly plan table */
-.monthly-table{width:100%;border-collapse:collapse;font-size:11px;overflow-x:auto;display:block}
-.monthly-table th{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);white-space:nowrap}
-.monthly-table td{padding:6px 8px;border-bottom:1px solid rgba(36,36,36,.5);font-family:var(--mono);white-space:nowrap}
-.monthly-table tr:last-child td{border-bottom:none}
-.monthly-table tr:hover td{background:var(--surface2)}
-.tag-plan{background:rgba(124,111,247,.15);color:var(--accent);padding:1px 5px;border-radius:3px;font-size:10px}
-.tag-ok{background:rgba(34,197,94,.15);color:var(--green);padding:1px 5px;border-radius:3px;font-size:10px}
-.tag-bad{background:rgba(239,68,68,.15);color:var(--red);padding:1px 5px;border-radius:3px;font-size:10px}
-.tag-cur{background:rgba(245,158,11,.15);color:var(--yellow);padding:1px 5px;border-radius:3px;font-size:10px}
-.tag-fut{color:var(--muted);font-size:10px}
+/* ── Chart area ── */
+.chart-stats-row { display: grid; grid-template-columns: 1fr 220px; gap: 12px; margin-bottom: 14px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+.card-title { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
 
-.table-wrap{overflow-y:auto;max-height:360px}
-table.trades-t{width:100%;border-collapse:collapse;font-size:12px}
-table.trades-t th{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;text-align:left;padding:7px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface)}
-table.trades-t td{padding:6px 8px;border-bottom:1px solid rgba(36,36,36,.6);font-family:var(--mono)}
-table.trades-t tr:last-child td{border-bottom:none}
-table.trades-t tr:hover td{background:var(--surface2)}
-tr.excluded td{opacity:.35;text-decoration:line-through}
-.badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600}
-.badge.long{background:rgba(34,197,94,.15);color:var(--green)}
-.badge.short{background:rgba(239,68,68,.15);color:var(--red)}
-.badge.manual{background:rgba(124,111,247,.15);color:var(--accent)}
-.pos{color:var(--green)}.neg{color:var(--red)}
+/* ── Stats ── */
+.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.stat-row:last-child { border-bottom: none; }
+.stat-row .lbl { color: var(--text3); }
+.stat-row .val { font-family: var(--mono); font-weight: 500; }
 
-.pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;flex-wrap:wrap}
-.page-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted2);padding:4px 9px;border-radius:5px;cursor:pointer;font-size:11px;font-family:var(--mono)}
-.page-btn:hover,.page-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.page-btn:disabled{opacity:.3;cursor:default}
-.page-info{font-size:11px;color:var(--muted2);font-family:var(--mono)}
+/* ── Win rate bar ── */
+.wr-bar { height: 3px; background: var(--border); border-radius: 2px; margin: 10px 0 4px; overflow: hidden; }
+.wr-fill { height: 100%; background: linear-gradient(90deg, var(--red), var(--green)); border-radius: 2px; transition: width .5s; }
 
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center}
-.modal-overlay.show{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;width:340px}
-.modal-title{font-size:14px;font-weight:600;margin-bottom:16px}
-.modal-field{margin-bottom:12px}
-.modal-field label{display:block;font-size:11px;color:var(--muted2);margin-bottom:4px}
-.modal-field input,.modal-field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:13px}
-.modal-field input:focus,.modal-field select:focus{outline:none;border-color:var(--accent)}
-.modal-field select option{background:var(--surface)}
-.modal-btns{display:flex;gap:8px;margin-top:16px}
+/* ── Monthly table ── */
+.monthly-wrap { overflow-x: auto; }
+.monthly-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.monthly-table th { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; font-weight: 400; }
+.monthly-table td { padding: 7px 10px; border-bottom: 1px solid rgba(30,30,58,.5); font-family: var(--mono); white-space: nowrap; }
+.monthly-table tr:last-child td { border-bottom: none; }
+.monthly-table tr:hover td { background: var(--surface2); }
+.monthly-table tr.cur-month td { background: rgba(91,143,255,.04); }
+.tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-family: var(--sans); font-weight: 500; }
+.tag-ok { background: var(--green-dim); color: var(--green); }
+.tag-bad { background: var(--red-dim); color: var(--red); }
+.tag-cur { background: var(--accent-dim); color: var(--accent); }
+.tag-fut { color: var(--text3); font-size: 10px; }
+.tag-nodata { background: var(--red-dim); color: var(--red); font-size: 10px; padding: 2px 7px; border-radius: 4px; }
 
-.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:10px;color:var(--muted2);font-size:12px;font-family:var(--mono)}
-.spinner{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.error-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:10px;color:var(--red);font-size:12px;font-family:var(--mono)}
-.setup-box{background:rgba(124,111,247,.08);border:1px solid rgba(124,111,247,.2);border-radius:10px;padding:20px;text-align:center;margin-bottom:14px}
-.setup-box h2{font-size:15px;color:var(--accent);margin-bottom:5px}
-.setup-box p{font-size:12px;color:var(--muted2);margin-bottom:12px}
-.progress-bar{height:2px;background:var(--border);border-radius:1px;margin-top:6px;overflow:hidden}
-.progress-fill{height:100%;background:var(--accent);transition:width .3s}
+/* ── Deposit/withdrawal row ── */
+.dep-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.dep-card { flex: 1; min-width: 150px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+.dep-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
+.dep-val { font-family: var(--mono); font-size: 18px; font-weight: 600; }
+.dep-val.dep { color: var(--green); }
+.dep-val.wd { color: var(--red); }
+.dep-val.net { color: var(--accent); }
 
-::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-@media(max-width:900px){.kpi-row{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}.ls-wrap{flex-direction:column}}
+/* ── Trades table ── */
+.trades-t { width: 100%; border-collapse: collapse; font-size: 12px; }
+.trades-t th { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); font-weight: 400; }
+.trades-t td { padding: 6px 8px; border-bottom: 1px solid rgba(30,30,58,.4); font-family: var(--mono); }
+.trades-t tr:last-child td { border-bottom: none; }
+.trades-t tr:hover td { background: var(--surface2); }
+tr.excluded td { opacity: .3; text-decoration: line-through; }
+.table-wrap { overflow-y: auto; max-height: 380px; }
+
+.badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+.badge.long { background: var(--green-dim); color: var(--green); }
+.badge.short { background: var(--red-dim); color: var(--red); }
+.badge.manual { background: var(--accent-dim); color: var(--accent); }
+.badge.deposit { background: var(--green-dim); color: var(--green); }
+.badge.withdrawal { background: var(--red-dim); color: var(--red); }
+.pos { color: var(--green); }
+.neg { color: var(--red); }
+.neutral { color: var(--accent); }
+
+/* ── Pagination ── */
+.pagination { display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 12px; flex-wrap: wrap; }
+.page-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text3); padding: 4px 9px; border-radius: 5px; cursor: pointer; font-size: 11px; font-family: var(--mono); transition: all .15s; }
+.page-btn:hover, .page-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.page-info { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+
+/* ── Modal ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 200; display: none; align-items: center; justify-content: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; padding: 22px; width: 360px; max-width: 95vw; }
+.modal-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text); }
+.modal-tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+.modal-tab { flex: 1; padding: 7px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text3); cursor: pointer; font-size: 12px; font-family: var(--sans); transition: all .15s; text-align: center; }
+.modal-tab.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.modal-section { display: none; }
+.modal-section.show { display: block; }
+.modal-field { margin-bottom: 12px; }
+.modal-field label { display: block; font-size: 11px; color: var(--text3); margin-bottom: 5px; }
+.modal-field input, .modal-field select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--text); font-family: var(--mono); font-size: 13px; }
+.modal-field input:focus, .modal-field select:focus { outline: none; border-color: var(--accent); }
+.modal-field select option { background: var(--surface); }
+.modal-btns { display: flex; gap: 8px; margin-top: 16px; }
+
+/* ── Loading ── */
+.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; gap: 10px; color: var(--text3); font-size: 12px; font-family: var(--mono); }
+.spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-box { background: var(--red-dim); border: 1px solid rgba(239,68,68,.3); border-radius: 8px; padding: 12px; color: var(--red); font-size: 12px; font-family: var(--mono); }
+.setup-box { background: var(--accent-dim); border: 1px solid rgba(91,143,255,.2); border-radius: 10px; padding: 22px; text-align: center; margin-bottom: 16px; }
+.setup-box h2 { font-size: 16px; color: var(--accent); margin-bottom: 6px; }
+.setup-box p { font-size: 12px; color: var(--text3); margin-bottom: 14px; }
+.progress-wrap { margin-bottom: 14px; display: none; }
+.progress-text { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-bottom: 5px; }
+.progress-bar { height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); transition: width .3s; }
+
+/* ── Insight cards ── */
+.insights-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.insight-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+.insight-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
+.insight-val { font-family: var(--mono); font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.insight-sub { font-size: 11px; color: var(--text3); }
+
+@media (max-width: 1000px) {
+  .kpi-row { grid-template-columns: repeat(3, 1fr); }
+  .chart-stats-row { grid-template-columns: 1fr; }
+  .ls-row { grid-template-columns: 1fr; }
+  .insights-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .main { padding: 12px; }
+}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="logo">◈ TRADING/DASHBOARD</div>
+  <div class="logo">◈ TRADING<span>/</span>DASHBOARD</div>
   <div class="header-right">
-    <div class="dot"></div>
-    <span class="ts" id="last-update">—</span>
-    <button class="btn" onclick="openAddTrade()">+ Сделка</button>
-    <button class="btn" onclick="loadData()">↻ Обновить</button>
-    <button class="btn" onclick="toggleConfig()">⚙ Настройки</button>
+    <div class="live-badge"><div class="live-dot"></div><span id="last-update">—</span></div>
+    <button class="btn" onclick="openAddTrade()">+ Запись</button>
+    <button class="btn" onclick="loadData()">↻</button>
+    <button class="btn" onclick="toggleConfig()">⚙</button>
   </div>
 </div>
 
 <div class="main">
+
+  <!-- Config -->
   <div class="config-panel" id="config-panel">
-    <div class="sec-title">Настройки подключения</div>
+    <div class="sec-title">Настройки</div>
     <div class="config-row">
-      <div class="field"><label>URL Cloudflare Worker</label><input type="text" id="worker-url" placeholder="https://...workers.dev"></div>
+      <div class="field"><label>Cloudflare Worker URL</label><input type="text" id="worker-url" placeholder="https://...workers.dev"></div>
       <div class="field" style="max-width:130px"><label>Стартовый капитал ($)</label><input type="number" id="start-capital" placeholder="3000"></div>
-      <div class="field" style="max-width:110px"><label>Рост в месяц (%)</label><input type="number" id="monthly-target" placeholder="20"></div>
+      <div class="field" style="max-width:110px"><label>Цель в месяц (%)</label><input type="number" id="monthly-target" placeholder="20"></div>
       <button class="btn primary" onclick="saveConfig()">Сохранить</button>
     </div>
   </div>
 
   <div class="setup-box" id="setup-hint" style="display:none">
-    <h2>Добро пожаловать</h2>
+    <h2>Настройки подключения</h2>
     <p>Укажи URL Cloudflare Worker для загрузки данных с Bybit</p>
-    <button class="btn primary" onclick="toggleConfig()">⚙ Настройки</button>
+    <button class="btn primary" onclick="toggleConfig()">⚙ Открыть настройки</button>
   </div>
 
-  <!-- Loading progress -->
-  <div id="load-progress" style="display:none;margin-bottom:12px">
-    <div style="font-size:11px;color:var(--muted2);font-family:var(--mono);margin-bottom:4px" id="load-text">Загрузка сделок...</div>
+  <!-- Progress -->
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-text" id="progress-text">Загрузка...</div>
     <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   </div>
 
+  <!-- Filters -->
   <div class="filters">
     <span class="filter-label">Период:</span>
-    <button class="fbtn active" onclick="setFilter('all',this)">Всё время</button>
-    <button class="fbtn" onclick="setFilter('2026',this)">2026</button>
+    <button class="fbtn" onclick="setFilter('all',this)">Всё время</button>
+    <button class="fbtn active" onclick="setFilter('2026',this)">2026</button>
+    <button class="fbtn" onclick="setFilter('prevmonth',this)">Прошлый месяц</button>
     <button class="fbtn" onclick="setFilter('7d',this)">7 дней</button>
-    <button class="fbtn" onclick="setFilter('30d',this)">30 дней</button>
     <button class="fbtn" onclick="setFilter('month',this)">Этот месяц</button>
     <div class="date-range">
       <input type="date" id="date-from" onchange="setFilter('custom',null)">
@@ -178,92 +281,158 @@ tr.excluded td{opacity:.35;text-decoration:line-through}
     </div>
   </div>
 
+  <!-- KPIs -->
   <div class="kpi-row">
     <div class="kpi"><div class="kpi-label">Стартовый капитал</div><div class="kpi-val" id="kpi-start">—</div></div>
-    <div class="kpi"><div class="kpi-label">Текущий капитал</div><div class="kpi-val purple" id="kpi-current">—</div></div>
+    <div class="kpi"><div class="kpi-label">Текущий капитал</div><div class="kpi-val blue" id="kpi-current">—</div></div>
     <div class="kpi"><div class="kpi-label">P&L за период</div><div class="kpi-val" id="kpi-pnl">—</div><div class="kpi-sub" id="kpi-pct"></div></div>
-    <div class="kpi"><div class="kpi-label">Винрейт</div><div class="kpi-val green" id="kpi-wr">—</div><div class="kpi-sub" id="kpi-trades"></div></div>
+    <div class="kpi"><div class="kpi-label">Винрейт</div><div class="kpi-val green" id="kpi-wr">—</div><div class="kpi-sub" id="kpi-trades-sub"></div></div>
     <div class="kpi"><div class="kpi-label">Ср. в день</div><div class="kpi-val" id="kpi-daily">—</div><div class="kpi-sub" id="kpi-per-trade"></div></div>
   </div>
 
-  <div class="grid-2">
+  <!-- Long / Short ABOVE chart -->
+  <div class="ls-row">
+    <div class="ls-card">
+      <div class="ls-big long" id="ls-long-cnt">—</div>
+      <div class="ls-info">
+        <div class="ls-title">Сделки в Long</div>
+        <div class="ls-wr" id="ls-long-wr"></div>
+        <div class="ls-nums">
+          <div class="ls-num"><div class="ln">Прибыль</div><div class="lv pos" id="ls-long-profit">—</div></div>
+          <div class="ls-num"><div class="ln">Убыток</div><div class="lv neg" id="ls-long-loss">—</div></div>
+          <div class="ls-num"><div class="ln">Итог</div><div class="lv" id="ls-long-pnl">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ls-card">
+      <div class="ls-big short" id="ls-short-cnt">—</div>
+      <div class="ls-info">
+        <div class="ls-title">Сделки в Short</div>
+        <div class="ls-wr" id="ls-short-wr"></div>
+        <div class="ls-nums">
+          <div class="ls-num"><div class="ln">Прибыль</div><div class="lv pos" id="ls-short-profit">—</div></div>
+          <div class="ls-num"><div class="ln">Убыток</div><div class="lv neg" id="ls-short-loss">—</div></div>
+          <div class="ls-num"><div class="ln">Итог</div><div class="lv" id="ls-short-pnl">—</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart + Stats -->
+  <div class="chart-stats-row">
     <div class="card">
       <div class="card-title">Кривая P&L (накопленный)</div>
-      <canvas id="chart" height="110"></canvas>
+      <canvas id="chart" height="120"></canvas>
     </div>
     <div class="card">
       <div class="card-title">Статистика</div>
-      <div id="stats-content"><div class="loading"><div class="spinner"></div>Загрузка...</div></div>
+      <div id="stats-content"><div class="loading"><div class="spinner"></div></div></div>
     </div>
   </div>
 
-  <!-- Monthly forecast -->
-  <div class="card" style="margin-bottom:10px">
-    <div class="card-title">Прогноз роста капитала — план vs факт (×<span id="growth-rate-label">1.20</span>/мес)</div>
-    <div style="overflow-x:auto"><div id="monthly-table"><div class="loading"><div class="spinner"></div></div></div></div>
-  </div>
-
-  <div class="ls-wrap">
-    <div class="ls-block">
-      <div class="ls-type">Long</div>
-      <div class="ls-count long" id="ls-long-cnt">—</div>
-      <div class="ls-wr" id="ls-long-wr"></div>
-      <div class="ls-nums">
-        <div class="ls-num"><div class="ln">Прибыль</div><div class="lv pos" id="ls-long-profit">—</div></div>
-        <div class="ls-num"><div class="ln">Убыток</div><div class="lv neg" id="ls-long-loss">—</div></div>
-        <div class="ls-num"><div class="ln">Итог</div><div class="lv" id="ls-long-pnl">—</div></div>
-      </div>
+  <!-- Extra insights -->
+  <div class="insights-row">
+    <div class="insight-card">
+      <div class="insight-label">Серия побед</div>
+      <div class="insight-val green" id="ins-streak">—</div>
+      <div class="insight-sub" id="ins-streak-sub">подряд прибыльных</div>
     </div>
-    <div class="ls-block">
-      <div class="ls-type">Short</div>
-      <div class="ls-count short" id="ls-short-cnt">—</div>
-      <div class="ls-wr" id="ls-short-wr"></div>
-      <div class="ls-nums">
-        <div class="ls-num"><div class="ln">Прибыль</div><div class="lv pos" id="ls-short-profit">—</div></div>
-        <div class="ls-num"><div class="ln">Убыток</div><div class="lv neg" id="ls-short-loss">—</div></div>
-        <div class="ls-num"><div class="ln">Итог</div><div class="lv" id="ls-short-pnl">—</div></div>
-      </div>
+    <div class="insight-card">
+      <div class="insight-label">Макс. просадка</div>
+      <div class="insight-val red" id="ins-drawdown">—</div>
+      <div class="insight-sub">от пика P&L</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-label">Profit Factor</div>
+      <div class="insight-val blue" id="ins-pf">—</div>
+      <div class="insight-sub">прибыль / убыток</div>
     </div>
   </div>
 
+  <!-- Deposit / Withdrawal summary -->
+  <div class="dep-row" id="dep-row" style="display:none">
+    <div class="dep-card"><div class="dep-label">Пополнений</div><div class="dep-val dep" id="dep-total">—</div></div>
+    <div class="dep-card"><div class="dep-label">Выводов</div><div class="dep-val wd" id="wd-total">—</div></div>
+    <div class="dep-card"><div class="dep-label">Чистый поток</div><div class="dep-val net" id="net-flow">—</div></div>
+  </div>
+
+  <!-- Monthly plan -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">
+      Прогноз роста — план vs факт
+      <span style="color:var(--text3);font-size:10px">+<span id="rate-label">20</span>% / мес от $<span id="start-label">3000</span></span>
+    </div>
+    <div class="monthly-wrap"><div id="monthly-table"><div class="loading"><div class="spinner"></div></div></div></div>
+  </div>
+
+  <!-- Trades journal -->
   <div class="card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div class="card-title" style="margin-bottom:0">Журнал сделок <span id="trade-count-label" style="color:var(--muted2)"></span></div>
+    <div class="card-title">
+      Журнал сделок <span id="trade-count-label" style="color:var(--text3)"></span>
       <div style="display:flex;gap:6px;align-items:center">
-        <span id="excluded-count" style="font-size:11px;color:var(--muted2)"></span>
+        <span id="excluded-count" style="font-size:11px;color:var(--text3)"></span>
         <button class="btn sm" onclick="clearExcluded()">Сбросить исключения</button>
       </div>
     </div>
-    <div class="table-wrap" id="trades-table"><div class="loading"><div class="spinner"></div>Загрузка...</div></div>
+    <div class="table-wrap" id="trades-table"><div class="loading"><div class="spinner"></div></div></div>
     <div class="pagination" id="pagination"></div>
   </div>
+
 </div>
 
+<!-- Modal: Add record -->
 <div class="modal-overlay" id="modal" onclick="closeModal(event)">
   <div class="modal">
-    <div class="modal-title">Добавить сделку вручную</div>
-    <div class="modal-field"><label>Дата</label><input type="date" id="m-date"></div>
-    <div class="modal-field"><label>Пара (необязательно)</label><input type="text" id="m-symbol" placeholder="BTC, ETH..."></div>
-    <div class="modal-field"><label>Направление</label><select id="m-side"><option value="Sell">LONG</option><option value="Buy">SHORT</option></select></div>
-    <div class="modal-field"><label>P&L ($)</label><input type="number" id="m-pnl" placeholder="12.50 или -5.00" step="0.01"></div>
-    <div class="modal-field"><label>Заметка (необязательно)</label><input type="text" id="m-note" placeholder=""></div>
+    <div class="modal-title">Добавить запись</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchTab('trade')">Сделка</button>
+      <button class="modal-tab" onclick="switchTab('deposit')">Пополнение</button>
+      <button class="modal-tab" onclick="switchTab('withdrawal')">Вывод</button>
+    </div>
+
+    <!-- Trade -->
+    <div class="modal-section show" id="tab-trade">
+      <div class="modal-field"><label>Дата</label><input type="date" id="m-date"></div>
+      <div class="modal-field"><label>Пара</label><input type="text" id="m-symbol" placeholder="BTC, ETH..."></div>
+      <div class="modal-field"><label>Направление</label><select id="m-side"><option value="Sell">LONG</option><option value="Buy">SHORT</option></select></div>
+      <div class="modal-field"><label>P&L ($)</label><input type="number" id="m-pnl" placeholder="12.50 или -5.00" step="0.01"></div>
+      <div class="modal-field"><label>Заметка</label><input type="text" id="m-note" placeholder="Необязательно"></div>
+    </div>
+
+    <!-- Deposit -->
+    <div class="modal-section" id="tab-deposit">
+      <div class="modal-field"><label>Дата</label><input type="date" id="d-date"></div>
+      <div class="modal-field"><label>Сумма ($)</label><input type="number" id="d-amount" placeholder="500" step="0.01"></div>
+      <div class="modal-field"><label>Заметка</label><input type="text" id="d-note" placeholder="Необязательно"></div>
+    </div>
+
+    <!-- Withdrawal -->
+    <div class="modal-section" id="tab-withdrawal">
+      <div class="modal-field"><label>Дата</label><input type="date" id="w-date"></div>
+      <div class="modal-field"><label>Сумма ($)</label><input type="number" id="w-amount" placeholder="500" step="0.01"></div>
+      <div class="modal-field"><label>Заметка</label><input type="text" id="w-note" placeholder="Необязательно"></div>
+    </div>
+
     <div class="modal-btns">
-      <button class="btn primary" style="flex:1" onclick="addManualTrade()">Добавить</button>
+      <button class="btn primary" style="flex:1" onclick="addRecord()">Добавить</button>
       <button class="btn" onclick="document.getElementById('modal').classList.remove('show')">Отмена</button>
     </div>
   </div>
 </div>
 
 <script>
+// ── State ─────────────────────────────────────────────────────────────────────
 let WORKER_URL = localStorage.getItem('worker_url') || '';
 let START_CAPITAL = parseFloat(localStorage.getItem('start_capital') || '3000');
 let MONTHLY_RATE = parseFloat(localStorage.getItem('monthly_rate') || '20') / 100;
 let chart = null;
 let allTrades = [];
 let manualTrades = JSON.parse(localStorage.getItem('manual_trades') || '[]');
+let cashFlows = JSON.parse(localStorage.getItem('cash_flows') || '[]'); // deposits/withdrawals
 let excludedIds = new Set(JSON.parse(localStorage.getItem('excluded') || '[]'));
 let currentBalance = null;
 let activeFilter = '2026';
+let activeTab = 'trade';
 let currentPage = 1;
 const PAGE_SIZE = 25;
 
@@ -283,43 +452,79 @@ function saveConfig() {
   START_CAPITAL = parseFloat(document.getElementById('start-capital').value) || 3000;
   MONTHLY_RATE = (parseFloat(document.getElementById('monthly-target').value) || 20) / 100;
   localStorage.setItem('worker_url', WORKER_URL);
-  localStorage.setItem('start_capital', START_CAPITAL);
-  localStorage.setItem('monthly_rate', Math.round(MONTHLY_RATE * 100));
+  localStorage.setItem('start_capital', String(START_CAPITAL));
+  localStorage.setItem('monthly_rate', String(Math.round(MONTHLY_RATE * 100)));
   document.getElementById('config-panel').classList.remove('show');
   document.getElementById('setup-hint').style.display = 'none';
   loadData();
 }
 
-// ── Manual trades ─────────────────────────────────────────────────────────────
+// ── Modal / Tabs ──────────────────────────────────────────────────────────────
 function openAddTrade() {
-  document.getElementById('m-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('m-pnl').value = '';
-  document.getElementById('m-symbol').value = '';
-  document.getElementById('m-note').value = '';
+  const today = new Date().toISOString().split('T')[0];
+  ['m-date','d-date','w-date'].forEach(id => { document.getElementById(id).value = today; });
+  ['m-pnl','m-symbol','m-note','d-amount','d-note','w-amount','w-note'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
   document.getElementById('modal').classList.add('show');
 }
+
 function closeModal(e) { if (e.target.id === 'modal') document.getElementById('modal').classList.remove('show'); }
-function addManualTrade() {
-  const pnl = parseFloat(document.getElementById('m-pnl').value);
-  if (isNaN(pnl)) { alert('Введи P&L'); return; }
-  const date = document.getElementById('m-date').value;
-  const trade = {
-    id: 'manual_' + Date.now(),
-    updatedTime: String(new Date(date).getTime()),
-    symbol: (document.getElementById('m-symbol').value.trim().toUpperCase() || 'MANUAL') + 'USDT',
-    side: document.getElementById('m-side').value,
-    closedPnl: String(pnl),
-    note: document.getElementById('m-note').value,
-    isManual: true
-  };
-  manualTrades.push(trade);
-  localStorage.setItem('manual_trades', JSON.stringify(manualTrades));
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.modal-tab').forEach((b, i) => {
+    const tabs = ['trade','deposit','withdrawal'];
+    b.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.modal-section').forEach(s => s.classList.remove('show'));
+  document.getElementById('tab-' + tab).classList.add('show');
+}
+
+function addRecord() {
+  if (activeTab === 'trade') {
+    const pnl = parseFloat(document.getElementById('m-pnl').value);
+    if (isNaN(pnl)) { alert('Введи P&L'); return; }
+    const date = document.getElementById('m-date').value;
+    manualTrades.push({
+      id: 'manual_' + Date.now(),
+      updatedTime: String(new Date(date).getTime()),
+      symbol: (document.getElementById('m-symbol').value.trim().toUpperCase() || 'MANUAL') + 'USDT',
+      side: document.getElementById('m-side').value,
+      closedPnl: String(pnl),
+      note: document.getElementById('m-note').value,
+      isManual: true
+    });
+    localStorage.setItem('manual_trades', JSON.stringify(manualTrades));
+  } else {
+    const isDeposit = activeTab === 'deposit';
+    const amount = parseFloat(document.getElementById(isDeposit ? 'd-amount' : 'w-amount').value);
+    if (isNaN(amount) || amount <= 0) { alert('Введи сумму'); return; }
+    const date = document.getElementById(isDeposit ? 'd-date' : 'w-date').value;
+    const note = document.getElementById(isDeposit ? 'd-note' : 'w-note').value;
+    cashFlows.push({
+      id: 'cf_' + Date.now(),
+      type: activeTab,
+      amount,
+      date,
+      ts: new Date(date).getTime(),
+      note
+    });
+    localStorage.setItem('cash_flows', JSON.stringify(cashFlows));
+  }
   document.getElementById('modal').classList.remove('show');
   rerender();
 }
+
 function deleteManual(id) {
   manualTrades = manualTrades.filter(t => t.id !== id);
   localStorage.setItem('manual_trades', JSON.stringify(manualTrades));
+  rerender();
+}
+
+function deleteCashFlow(id) {
+  cashFlows = cashFlows.filter(c => c.id !== id);
+  localStorage.setItem('cash_flows', JSON.stringify(cashFlows));
   rerender();
 }
 
@@ -329,11 +534,7 @@ function toggleExclude(id) {
   localStorage.setItem('excluded', JSON.stringify([...excludedIds]));
   rerender();
 }
-function clearExcluded() {
-  excludedIds.clear();
-  localStorage.setItem('excluded', '[]');
-  rerender();
-}
+function clearExcluded() { excludedIds.clear(); localStorage.setItem('excluded', '[]'); rerender(); }
 
 // ── Filters ───────────────────────────────────────────────────────────────────
 function setFilter(type, btn) {
@@ -349,10 +550,15 @@ function filterTrades(trades) {
   const toInput = document.getElementById('date-to').value;
   return trades.filter(t => {
     const ts = parseInt(t.updatedTime);
-    if (activeFilter === '2026') { const d = new Date(ts); return d.getFullYear() === 2026; }
+    if (activeFilter === '2026') { return new Date(ts).getFullYear() === 2026; }
     if (activeFilter === '7d') return ts > now - 7*86400000;
-    if (activeFilter === '30d') return ts > now - 30*86400000;
-    if (activeFilter === 'month') { const d=new Date(); d.setDate(1); d.setHours(0,0,0,0); return ts>d.getTime(); }
+    if (activeFilter === 'month') { const d=new Date(); d.setDate(1); d.setHours(0,0,0,0); return ts >= d.getTime(); }
+    if (activeFilter === 'prevmonth') {
+      const d = new Date(); d.setDate(1); d.setHours(0,0,0,0);
+      const end = d.getTime() - 1;
+      d.setMonth(d.getMonth() - 1);
+      return ts >= d.getTime() && ts <= end;
+    }
     if (activeFilter === 'custom') {
       const from = fromInput ? new Date(fromInput).getTime() : 0;
       const to = toInput ? new Date(toInput).getTime() + 86400000 : Infinity;
@@ -362,28 +568,29 @@ function filterTrades(trades) {
   });
 }
 
-// ── API — fetch ALL trades for 2026 in monthly chunks ────────────────────────
+// ── API ───────────────────────────────────────────────────────────────────────
 async function callWorker(endpoint, params = {}) {
   const url = new URL(WORKER_URL);
   url.searchParams.set('endpoint', endpoint);
-  for (const [k,v] of Object.entries(params)) url.searchParams.set(k,v);
+  for (const [k,v] of Object.entries(params)) url.searchParams.set(k, v);
   const res = await fetch(url.toString());
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
-// Fetch ALL 2026 trades using weekly time windows
+function setProgress(pct, text) {
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = text;
+}
+
 async function fetchAllTrades2026() {
-  const all = new Map(); // deduplicate by orderId
+  const all = new Map();
   const yearStart = new Date('2026-01-01T00:00:00.000Z').getTime();
   const now = Date.now();
-
-  // Build weekly chunks
   const WEEK = 7 * 24 * 3600 * 1000;
   const chunks = [];
-  for (let s = yearStart; s < now; s += WEEK) {
+  for (let s = yearStart; s < now; s += WEEK)
     chunks.push({ start: s, end: Math.min(s + WEEK - 1, now) });
-  }
 
   for (let ci = 0; ci < chunks.length; ci++) {
     const { start, end } = chunks[ci];
@@ -391,21 +598,15 @@ async function fetchAllTrades2026() {
     const label = new Date(start).toLocaleDateString('ru', { day:'numeric', month:'short' });
     setProgress(pct, `Загрузка с ${label}... (${all.size} сделок)`);
 
-    let cursor = '';
-    let pageN = 0;
+    let cursor = '', pageN = 0;
     while (pageN < 15) {
-      const params = { category: 'linear', limit: 100,
-        startTime: String(start), endTime: String(end) };
+      const params = { category: 'linear', limit: 100, startTime: String(start), endTime: String(end) };
       if (cursor) params.cursor = cursor;
-
       let data;
-      try { data = await callWorker('/v5/position/closed-pnl', params); }
-      catch(e) { break; }
-
+      try { data = await callWorker('/v5/position/closed-pnl', params); } catch(e) { break; }
       if (data.retCode !== 0) break;
       const list = data.result?.list || [];
-      list.forEach(t => all.set(t.orderId || t.createdTime, t));
-
+      list.forEach(t => all.set(t.orderId || (t.symbol + t.updatedTime), t));
       cursor = data.result?.nextPageCursor || '';
       pageN++;
       if (!cursor || list.length < 100) break;
@@ -413,40 +614,25 @@ async function fetchAllTrades2026() {
     }
     await new Promise(r => setTimeout(r, 80));
   }
-
-  const result = [...all.values()];
-  setProgress(100, `Загружено ${result.length} сделок`);
-  return result;
-}
-
-function setProgress(pct, text) {
-  document.getElementById('progress-fill').style.width = pct + '%';
-  document.getElementById('load-text').textContent = text;
+  setProgress(100, `Загружено ${all.size} сделок`);
+  return [...all.values()];
 }
 
 async function loadData() {
   if (!WORKER_URL) { document.getElementById('setup-hint').style.display = 'block'; return; }
-
-  document.getElementById('load-progress').style.display = 'block';
-  document.getElementById('stats-content').innerHTML = '<div class="loading"><div class="spinner"></div>Загрузка...</div>';
-  document.getElementById('trades-table').innerHTML = '<div class="loading"><div class="spinner"></div>Загрузка...</div>';
-  document.getElementById('monthly-table').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-
+  document.getElementById('progress-wrap').style.display = 'block';
   try {
     allTrades = await fetchAllTrades2026();
-
     try {
       const wd = await callWorker('/v5/account/wallet-balance', { accountType: 'UNIFIED' });
       if (wd.retCode === 0) currentBalance = parseFloat(wd.result.list[0]?.totalEquity || 0);
     } catch(e) {}
-
-    document.getElementById('load-progress').style.display = 'none';
+    document.getElementById('progress-wrap').style.display = 'none';
     rerender();
     document.getElementById('last-update').textContent = new Date().toLocaleTimeString('ru');
   } catch(e) {
-    document.getElementById('load-progress').style.display = 'none';
+    document.getElementById('progress-wrap').style.display = 'none';
     document.getElementById('trades-table').innerHTML = `<div class="error-box">Ошибка: ${e.message}</div>`;
-    document.getElementById('stats-content').innerHTML = `<div class="error-box">Проверь Worker и ключи</div>`;
   }
 }
 
@@ -458,14 +644,172 @@ function rerender() {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const f2 = n => (parseFloat(n) >= 0 ? '+' : '') + parseFloat(n).toFixed(2);
-const fUSD = n => '$' + parseFloat(n).toFixed(2);
+const fUSD = n => '$' + Math.abs(parseFloat(n)).toFixed(2);
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderDashboard(trades, balance, allCombined) {
+  const sorted = [...trades].sort((a,b) => parseInt(a.updatedTime) - parseInt(b.updatedTime));
+
+  let totalPnl=0, wins=0, losses=0;
+  let longCnt=0, longW=0, longProfit=0, longLoss=0;
+  let shortCnt=0, shortW=0, shortProfit=0, shortLoss=0;
+  const daily = {};
+  const chartPnl = [0], chartPoints = [];
+  let cum = 0, peak = 0, maxDD = 0;
+  let curStreak = 0, maxStreak = 0, totalProfit = 0, totalLoss = 0;
+
+  for (const t of sorted) {
+    const pnl = parseFloat(t.closedPnl);
+    const excl = excludedIds.has(t.id || t.orderId);
+    const date = new Date(parseInt(t.updatedTime)).toLocaleDateString('ru');
+    cum += excl ? 0 : pnl;
+    chartPnl.push(+cum.toFixed(2));
+    chartPoints.push({ date, pnl, cum: +cum.toFixed(2), sym: t.symbol });
+
+    if (!excl) {
+      totalPnl += pnl;
+      if (pnl >= 0) { wins++; curStreak++; maxStreak = Math.max(maxStreak, curStreak); totalProfit += pnl; }
+      else { losses++; curStreak = 0; totalLoss += Math.abs(pnl); }
+      daily[date] = (daily[date] || 0) + pnl;
+      peak = Math.max(peak, cum);
+      maxDD = Math.max(maxDD, peak - cum);
+      if (t.side === 'Sell') { longCnt++; if(pnl>=0){longW++;longProfit+=pnl;}else longLoss+=pnl; }
+      else { shortCnt++; if(pnl>=0){shortW++;shortProfit+=pnl;}else shortLoss+=pnl; }
+    }
+  }
+
+  const total = wins + losses;
+  const wr = total ? (wins/total*100).toFixed(1) : 0;
+  const days = Math.max(Object.keys(daily).length, 1);
+  const avgD = totalPnl / days;
+  const avgT = total ? totalPnl / total : 0;
+  const curCap = balance !== null ? balance : (START_CAPITAL + totalPnl);
+  const profitFactor = totalLoss > 0 ? (totalProfit / totalLoss).toFixed(2) : '∞';
+
+  // Cash flows for period
+  const filteredCF = cashFlows.filter(cf => {
+    if (activeFilter === 'all') return true;
+    if (activeFilter === '2026') return new Date(cf.ts).getFullYear() === 2026;
+    return true;
+  });
+  const totalDep = filteredCF.filter(c=>c.type==='deposit').reduce((s,c)=>s+c.amount,0);
+  const totalWd = filteredCF.filter(c=>c.type==='withdrawal').reduce((s,c)=>s+c.amount,0);
+  if (filteredCF.length > 0) {
+    document.getElementById('dep-row').style.display = 'flex';
+    document.getElementById('dep-total').textContent = '+$' + totalDep.toFixed(2);
+    document.getElementById('wd-total').textContent = '-$' + totalWd.toFixed(2);
+    const net = totalDep - totalWd;
+    const netEl = document.getElementById('net-flow');
+    netEl.textContent = (net >= 0 ? '+' : '') + '$' + net.toFixed(2);
+    netEl.className = 'dep-val ' + (net >= 0 ? 'dep' : 'wd');
+  } else {
+    document.getElementById('dep-row').style.display = 'none';
+  }
+
+  // KPIs
+  document.getElementById('kpi-start').textContent = '$' + START_CAPITAL.toLocaleString();
+  document.getElementById('kpi-current').textContent = '$' + curCap.toFixed(0);
+  const pEl = document.getElementById('kpi-pnl');
+  pEl.textContent = f2(totalPnl);
+  pEl.className = 'kpi-val ' + (totalPnl >= 0 ? 'green' : 'red');
+  document.getElementById('kpi-pct').textContent = ((totalPnl/START_CAPITAL)*100).toFixed(1) + '% от депозита';
+  document.getElementById('kpi-wr').textContent = wr + '%';
+  document.getElementById('kpi-trades-sub').textContent = total + ' сд · ' + wins + '↑ ' + losses + '↓';
+  const dEl = document.getElementById('kpi-daily');
+  dEl.textContent = f2(avgD);
+  dEl.className = 'kpi-val ' + (avgD >= 0 ? 'green' : 'red');
+  document.getElementById('kpi-per-trade').textContent = f2(avgT) + ' / сделку';
+
+  // Long/Short
+  document.getElementById('ls-long-cnt').textContent = longCnt;
+  document.getElementById('ls-long-wr').textContent = longCnt ? (longW/longCnt*100).toFixed(0) + '% винрейт' : '';
+  document.getElementById('ls-long-profit').textContent = '+$' + longProfit.toFixed(2);
+  document.getElementById('ls-long-loss').textContent = '-$' + Math.abs(longLoss).toFixed(2);
+  const lpEl = document.getElementById('ls-long-pnl');
+  lpEl.textContent = f2(longProfit+longLoss);
+  lpEl.className = 'lv ' + ((longProfit+longLoss)>=0?'pos':'neg');
+  document.getElementById('ls-short-cnt').textContent = shortCnt;
+  document.getElementById('ls-short-wr').textContent = shortCnt ? (shortW/shortCnt*100).toFixed(0) + '% винрейт' : '';
+  document.getElementById('ls-short-profit').textContent = '+$' + shortProfit.toFixed(2);
+  document.getElementById('ls-short-loss').textContent = '-$' + Math.abs(shortLoss).toFixed(2);
+  const spEl = document.getElementById('ls-short-pnl');
+  spEl.textContent = f2(shortProfit+shortLoss);
+  spEl.className = 'lv ' + ((shortProfit+shortLoss)>=0?'pos':'neg');
+
+  // Stats
+  const dVals = Object.values(daily);
+  document.getElementById('stats-content').innerHTML = `
+    <div class="stat-row"><span class="lbl">Дней торгов</span><span class="val">${days}</span></div>
+    <div class="stat-row"><span class="lbl">Всего сделок</span><span class="val">${total}</span></div>
+    <div class="stat-row"><span class="lbl">Плюс / Минус</span><span class="val">${wins} / ${losses}</span></div>
+    <div class="stat-row"><span class="lbl">Винрейт</span><span class="val" style="color:var(--green)">${wr}%</span></div>
+    <div class="wr-bar"><div class="wr-fill" style="width:${wr}%"></div></div>
+    <div class="stat-row"><span class="lbl">P&L к депозиту</span><span class="val" style="color:${totalPnl>=0?'var(--green)':'var(--red)'}">${((totalPnl/START_CAPITAL)*100).toFixed(1)}%</span></div>
+    <div class="stat-row"><span class="lbl">Лучший день</span><span class="val pos">${dVals.length ? f2(Math.max(...dVals)) : '—'}</span></div>
+    <div class="stat-row"><span class="lbl">Худший день</span><span class="val neg">${dVals.length ? f2(Math.min(...dVals)) : '—'}</span></div>`;
+
+  // Insights
+  document.getElementById('ins-streak').textContent = maxStreak;
+  document.getElementById('ins-streak-sub').textContent = 'макс. серия побед';
+  document.getElementById('ins-drawdown').textContent = '-$' + maxDD.toFixed(2);
+  document.getElementById('ins-pf').textContent = profitFactor;
+
+  // Chart
+  if (chart) chart.destroy();
+  const ctx = document.getElementById('chart').getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,140);
+  grad.addColorStop(0,'rgba(91,143,255,0.2)');
+  grad.addColorStop(1,'rgba(91,143,255,0)');
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: chartPnl.map((_,i)=>i),
+      datasets: [{
+        data: chartPnl,
+        borderColor: '#5b8fff',
+        backgroundColor: grad,
+        borderWidth: 1.5,
+        pointRadius: chartPnl.map((_,i) => i===0 ? 0 : 2.5),
+        pointBackgroundColor: chartPnl.map((v,i) => {
+          if (i===0) return 'transparent';
+          return parseFloat(chartPoints[i-1]?.pnl||0) >= 0 ? 'rgba(34,197,94,.9)' : 'rgba(239,68,68,.9)';
+        }),
+        pointHoverRadius: 5, fill: true, tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true, interaction: { mode:'index', intersect:false },
+      plugins: {
+        legend: { display:false },
+        tooltip: {
+          backgroundColor:'#0e0e1c', borderColor:'#1e1e3a', borderWidth:1,
+          titleColor:'#505078', bodyColor:'#e8edf5',
+          titleFont:{family:'JetBrains Mono',size:10}, bodyFont:{family:'JetBrains Mono',size:12},
+          callbacks: {
+            title: ctx => { const i=ctx[0].dataIndex; if(i===0)return'Старт'; const pt=chartPoints[i-1]; return pt?pt.date+' · '+(pt.sym||'').replace('USDT',''):''; },
+            label: ctx => { const i=ctx.dataIndex; if(i===0)return'P&L: $0.00'; const pt=chartPoints[i-1]; const tp=pt?parseFloat(pt.pnl):0; return['Сделка: '+(tp>=0?'+':'')+tp.toFixed(2),'Накоплено: '+(ctx.parsed.y>=0?'+':'')+ctx.parsed.y.toFixed(2)]; }
+          }
+        }
+      },
+      scales: {
+        x: { display:false },
+        y: { grid:{color:'rgba(30,30,58,.8)'}, ticks:{color:'#505078',font:{family:'JetBrains Mono',size:10},callback:v=>(v>=0?'+':'')+v} }
+      }
+    }
+  });
+
+  renderMonthly(allCombined, balance);
+  renderTable(trades);
+
+  document.getElementById('rate-label').textContent = Math.round(MONTHLY_RATE * 100);
+  document.getElementById('start-label').textContent = START_CAPITAL.toLocaleString();
+  document.getElementById('trade-count-label').textContent = `(${trades.length})`;
+  const excCount = [...excludedIds].filter(id => trades.some(t=>(t.id||t.orderId)===id)).length;
+  document.getElementById('excluded-count').textContent = excCount ? `Исключено: ${excCount}` : '';
+}
 
 // ── Monthly forecast ──────────────────────────────────────────────────────────
 function renderMonthly(allCombined, balance) {
-  const rate = MONTHLY_RATE;
-  document.getElementById('growth-rate-label').textContent = (1 + rate).toFixed(2);
-
-  // Group all trades by month
   const byMonth = {};
   for (const t of allCombined) {
     if (excludedIds.has(t.id || t.orderId)) continue;
@@ -473,78 +817,55 @@ function renderMonthly(allCombined, balance) {
     const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
     byMonth[key] = (byMonth[key] || 0) + parseFloat(t.closedPnl);
   }
-
-  // Build months from Jan 2026 to Dec 2026
-  const months = [];
-  for (let m = 1; m <= 12; m++) {
-    months.push(`2026-${String(m).padStart(2,'0')}`);
-  }
-
   const now = new Date();
   const curKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
 
-  let planCap = START_CAPITAL;
-  let rows = '';
-  for (const key of months) {
-    const [yr, mo] = key.split('-');
-    const monthName = new Date(parseInt(yr), parseInt(mo)-1, 1)
-      .toLocaleString('ru', { month: 'long', year: 'numeric' });
-
-    const planProfit = planCap * rate;
-    const planEnd = planCap * (1 + rate);
+  let planCap = START_CAPITAL, rows = '';
+  for (let m = 1; m <= 12; m++) {
+    const key = `2026-${String(m).padStart(2,'0')}`;
+    const d = new Date(2026, m-1, 1);
+    const monthName = d.toLocaleString('ru', { month: 'long' });
+    const planProfit = planCap * MONTHLY_RATE;
+    const planEnd = planCap * (1 + MONTHLY_RATE);
     const fact = byMonth[key];
     const hasFact = fact !== undefined;
+    let statusTag='', factCell='—', devCell='—', factEndCell='—';
+    const isCur = key === curKey, isPast = key < curKey;
 
-    let statusTag = '';
-    let factCell = '—';
-    let deviationCell = '—';
-    let factEndCell = '—';
-
-    if (key < curKey) {
-      // Past month
+    if (isPast) {
       if (hasFact) {
         const dev = fact - planProfit;
         const devPct = (dev / planProfit * 100).toFixed(1);
         factCell = `<span class="${fact>=0?'pos':'neg'}">${f2(fact)}</span>`;
-        deviationCell = `<span class="${dev>=0?'pos':'neg'}">${f2(dev)} (${dev>=0?'+':''}${devPct}%)</span>`;
-        // For current month use real wallet balance if available
-        if (key === curKey && balance !== null) {
-          factEndCell = fUSD(balance);
-        } else {
-          factEndCell = fUSD(planCap + fact);
-        }
-        statusTag = fact >= planProfit
-          ? `<span class="tag-ok">✓ Выполнен</span>`
-          : `<span class="tag-bad">✗ Не выполнен</span>`;
+        devCell = `<span class="${dev>=0?'pos':'neg'}">${f2(dev)} (${dev>=0?'+':''}${devPct}%)</span>`;
+        factEndCell = fUSD(planCap + fact);
+        statusTag = fact >= planProfit ? `<span class="tag tag-ok">✓ Выполнен</span>` : `<span class="tag tag-bad">✗ Не выполнен</span>`;
       } else {
-        statusTag = `<span class="tag-bad">нет данных</span>`;
+        statusTag = `<span class="tag-nodata">нет данных</span>`;
       }
-    } else if (key === curKey) {
-      // Current month
+    } else if (isCur) {
       if (hasFact) {
         const dev = fact - planProfit;
         const devPct = (dev / planProfit * 100).toFixed(1);
         factCell = `<span class="${fact>=0?'pos':'neg'}">${f2(fact)}</span>`;
-        deviationCell = `<span class="${dev>=0?'pos':'neg'}">${f2(dev)} (${dev>=0?'+':''}${devPct}%)</span>`;
+        devCell = `<span class="${dev>=0?'pos':'neg'}">${f2(dev)} (${dev>=0?'+':''}${devPct}%)</span>`;
         factEndCell = balance !== null ? fUSD(balance) : fUSD(planCap + fact);
       }
-      statusTag = `<span class="tag-cur">▶ Текущий</span>`;
+      statusTag = `<span class="tag tag-cur">▶ Текущий</span>`;
     } else {
-      // Future
       statusTag = `<span class="tag-fut">— прогноз</span>`;
     }
 
-    rows += `<tr>
-      <td>${monthName}</td>
+    rows += `<tr class="${isCur?'cur-month':''}">
+      <td style="color:var(--text2)">${monthName} 2026</td>
       <td>${statusTag}</td>
       <td>${fUSD(planCap)}</td>
       <td class="pos">+${fUSD(planProfit)}</td>
-      <td>${fUSD(planEnd)}</td>
+      <td style="color:var(--text2)">${fUSD(planEnd)}</td>
       <td>${factCell}</td>
       <td>${factEndCell}</td>
-      <td>${deviationCell}</td>
+      <td>${devCell}</td>
     </tr>`;
-
     planCap = planEnd;
   }
 
@@ -559,150 +880,31 @@ function renderMonthly(allCombined, balance) {
     </table>`;
 }
 
-// ── Main render ───────────────────────────────────────────────────────────────
-function renderDashboard(trades, balance, allCombined) {
-  const sorted = [...trades].sort((a,b) => parseInt(a.updatedTime) - parseInt(b.updatedTime));
-
-  let totalPnl=0, wins=0, losses=0;
-  let longCnt=0,longW=0,longProfit=0,longLoss=0;
-  let shortCnt=0,shortW=0,shortProfit=0,shortLoss=0;
-  const daily = {};
-  const chartPnl = [0];
-  const chartPoints = [];
-  let cum = 0;
-
-  for (const t of sorted) {
-    const pnl = parseFloat(t.closedPnl);
-    const excluded = excludedIds.has(t.id || t.orderId);
-    const date = new Date(parseInt(t.updatedTime)).toLocaleDateString('ru');
-    cum += excluded ? 0 : pnl;
-    chartPnl.push(+cum.toFixed(2));
-    chartPoints.push({ date, pnl, cum: +cum.toFixed(2), sym: t.symbol, excluded });
-
-    if (!excluded) {
-      totalPnl += pnl;
-      if (pnl >= 0) wins++; else losses++;
-      daily[date] = (daily[date] || 0) + pnl;
-      if (t.side === 'Sell') { longCnt++; if(pnl>=0){longW++;longProfit+=pnl;}else longLoss+=pnl; }
-      else { shortCnt++; if(pnl>=0){shortW++;shortProfit+=pnl;}else shortLoss+=pnl; }
+// ── Trades table ──────────────────────────────────────────────────────────────
+function renderTable(trades) {
+  // Merge with cash flows for display
+  const allRows = [
+    ...trades.map(t => ({ ...t, rowType: 'trade' })),
+    ...cashFlows.map(cf => ({
+      id: cf.id, updatedTime: String(cf.ts), rowType: cf.type,
+      closedPnl: cf.type === 'deposit' ? String(cf.amount) : String(-cf.amount),
+      symbol: 'USDT', side: '', note: cf.note, isCashFlow: true, amount: cf.amount
+    }))
+  ].filter(t => {
+    // apply same filter
+    const ts = parseInt(t.updatedTime);
+    if (activeFilter === '2026') return new Date(ts).getFullYear() === 2026;
+    if (activeFilter === '7d') return ts > Date.now() - 7*86400000;
+    if (activeFilter === 'month') { const d=new Date();d.setDate(1);d.setHours(0,0,0,0);return ts>=d.getTime(); }
+    if (activeFilter === 'prevmonth') {
+      const d=new Date();d.setDate(1);d.setHours(0,0,0,0);
+      const end=d.getTime()-1; d.setMonth(d.getMonth()-1);
+      return ts>=d.getTime()&&ts<=end;
     }
-  }
-
-  const total = wins + losses;
-  const wr = total ? (wins/total*100).toFixed(1) : 0;
-  const days = Math.max(Object.keys(daily).length, 1);
-  const avgD = totalPnl / days;
-  const avgT = total ? totalPnl / total : 0;
-  const curCap = balance !== null ? balance : (START_CAPITAL + totalPnl);
-
-  document.getElementById('kpi-start').textContent = '$' + START_CAPITAL.toLocaleString();
-  document.getElementById('kpi-current').textContent = '$' + curCap.toFixed(0);
-  const pEl = document.getElementById('kpi-pnl');
-  pEl.textContent = f2(totalPnl);
-  pEl.className = 'kpi-val ' + (totalPnl >= 0 ? 'green' : 'red');
-  document.getElementById('kpi-pct').textContent = ((totalPnl/START_CAPITAL)*100).toFixed(1) + '% от депозита';
-  document.getElementById('kpi-wr').textContent = wr + '%';
-  document.getElementById('kpi-trades').textContent = total + ' сд · ' + wins + '↑ ' + losses + '↓';
-  const dEl = document.getElementById('kpi-daily');
-  dEl.textContent = f2(avgD);
-  dEl.className = 'kpi-val ' + (avgD >= 0 ? 'green' : 'red');
-  document.getElementById('kpi-per-trade').textContent = f2(avgT) + ' / сд';
-  document.getElementById('trade-count-label').textContent = `(${trades.length})`;
-
-  const dVals = Object.values(daily);
-  document.getElementById('stats-content').innerHTML = `
-    <div class="stat-row"><span class="lbl">Дней торгов</span><span class="val">${days}</span></div>
-    <div class="stat-row"><span class="lbl">Всего сделок</span><span class="val">${total}</span></div>
-    <div class="stat-row"><span class="lbl">Плюс / Минус</span><span class="val">${wins} / ${losses}</span></div>
-    <div class="stat-row"><span class="lbl">Винрейт</span><span class="val" style="color:var(--green)">${wr}%</span></div>
-    <div class="stat-row"><span class="lbl">P&L к депозиту</span><span class="val" style="color:${totalPnl>=0?'var(--green)':'var(--red)'}">${((totalPnl/START_CAPITAL)*100).toFixed(1)}%</span></div>
-    <div class="stat-row"><span class="lbl">Лучший день</span><span class="val pos">${dVals.length ? f2(Math.max(...dVals)) : '—'}</span></div>
-    <div class="stat-row"><span class="lbl">Худший день</span><span class="val neg">${dVals.length ? f2(Math.min(...dVals)) : '—'}</span></div>`;
-
-  document.getElementById('ls-long-cnt').textContent = longCnt;
-  document.getElementById('ls-long-wr').textContent = longCnt ? (longW/longCnt*100).toFixed(0)+'% винрейт':'';
-  document.getElementById('ls-long-profit').textContent = '+$'+longProfit.toFixed(2);
-  document.getElementById('ls-long-loss').textContent = '-$'+Math.abs(longLoss).toFixed(2);
-  const lpEl = document.getElementById('ls-long-pnl');
-  lpEl.textContent = f2(longProfit+longLoss);
-  lpEl.className = 'lv '+((longProfit+longLoss)>=0?'pos':'neg');
-
-  document.getElementById('ls-short-cnt').textContent = shortCnt;
-  document.getElementById('ls-short-wr').textContent = shortCnt ? (shortW/shortCnt*100).toFixed(0)+'% винрейт':'';
-  document.getElementById('ls-short-profit').textContent = '+$'+shortProfit.toFixed(2);
-  document.getElementById('ls-short-loss').textContent = '-$'+Math.abs(shortLoss).toFixed(2);
-  const spEl = document.getElementById('ls-short-pnl');
-  spEl.textContent = f2(shortProfit+shortLoss);
-  spEl.className = 'lv '+((shortProfit+shortLoss)>=0?'pos':'neg');
-
-  // Chart
-  if (chart) chart.destroy();
-  const ctx = document.getElementById('chart').getContext('2d');
-  const grad = ctx.createLinearGradient(0,0,0,130);
-  grad.addColorStop(0,'rgba(124,111,247,0.2)');
-  grad.addColorStop(1,'rgba(124,111,247,0)');
-  chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: chartPnl.map((_,i) => i),
-      datasets: [{
-        data: chartPnl,
-        borderColor: '#7c6ff7',
-        backgroundColor: grad,
-        borderWidth: 1.5,
-        pointRadius: chartPnl.map((_,i) => i===0 ? 0 : 2),
-        pointBackgroundColor: chartPnl.map((v,i) => {
-          if (i===0) return 'transparent';
-          const p = parseFloat(chartPoints[i-1]?.pnl || 0);
-          return p >= 0 ? 'rgba(34,197,94,0.8)' : 'rgba(239,68,68,0.8)';
-        }),
-        pointHoverRadius: 5,
-        fill: true, tension: 0.3,
-      }]
-    },
-    options: {
-      responsive: true,
-      interaction: { mode:'index', intersect:false },
-      plugins: {
-        legend: { display:false },
-        tooltip: {
-          backgroundColor:'#1a1a1a', borderColor:'#333', borderWidth:1,
-          titleColor:'#888', bodyColor:'#f0f0f0',
-          titleFont:{family:'JetBrains Mono',size:10},
-          bodyFont:{family:'JetBrains Mono',size:12},
-          callbacks: {
-            title: ctx => {
-              const i = ctx[0].dataIndex;
-              if (i===0) return 'Старт';
-              const pt = chartPoints[i-1];
-              return pt ? pt.date + ' · ' + (pt.sym||'').replace('USDT','') : '';
-            },
-            label: ctx => {
-              const i = ctx.dataIndex;
-              if (i===0) return 'P&L: $0.00';
-              const pt = chartPoints[i-1];
-              const tp = pt ? parseFloat(pt.pnl) : 0;
-              return ['Сделка: '+(tp>=0?'+':'')+tp.toFixed(2), 'Накоплено: '+(ctx.parsed.y>=0?'+':'')+ctx.parsed.y.toFixed(2)];
-            }
-          }
-        }
-      },
-      scales: {
-        x: { display:false },
-        y: { grid:{color:'rgba(36,36,36,1)'}, ticks:{color:'#555',font:{family:'JetBrains Mono',size:10},callback:v=>(v>=0?'+':'')+v} }
-      }
-    }
+    return true;
   });
 
-  renderTable(trades);
-  renderMonthly(allCombined || [...allTrades, ...manualTrades], balance);
-
-  const excCount = [...excludedIds].filter(id => trades.some(t=>(t.id||t.orderId)===id)).length;
-  document.getElementById('excluded-count').textContent = excCount ? `Исключено: ${excCount}` : '';
-}
-
-function renderTable(trades) {
-  const sorted = [...trades].sort((a,b) => parseInt(b.updatedTime)-parseInt(a.updatedTime));
+  const sorted = allRows.sort((a,b) => parseInt(b.updatedTime) - parseInt(a.updatedTime));
   const total = sorted.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   if (currentPage > totalPages) currentPage = totalPages;
@@ -710,41 +912,55 @@ function renderTable(trades) {
   const page = sorted.slice(start, start+PAGE_SIZE);
 
   const rows = page.map((t, i) => {
-    const pnl = parseFloat(t.closedPnl);
     const date = new Date(parseInt(t.updatedTime)).toLocaleDateString('ru');
-    const side = t.side === 'Sell' ? 'LONG' : 'SHORT';
     const tid = t.id || t.orderId;
-    const excluded = excludedIds.has(tid);
+    const excl = excludedIds.has(tid);
+
+    if (t.isCashFlow) {
+      const isDep = t.rowType === 'deposit';
+      return `<tr>
+        <td style="color:var(--text3)">${start+i+1}</td>
+        <td>${date}</td>
+        <td style="color:var(--text2)">—</td>
+        <td><span class="badge ${t.rowType}">${isDep ? '↓ Пополнение' : '↑ Вывод'}</span></td>
+        <td class="${isDep?'pos':'neg'}">${isDep?'+':'-'}$${t.amount.toFixed(2)}</td>
+        <td><button class="btn sm" onclick="deleteCashFlow('${tid}')">🗑</button></td>
+      </tr>`;
+    }
+
+    const pnl = parseFloat(t.closedPnl);
+    const side = t.side === 'Sell' ? 'LONG' : 'SHORT';
     const sym = (t.symbol||'').replace('USDT','');
-    const note = t.note ? ` <span style="color:var(--muted2);font-size:10px">${t.note}</span>` : '';
-    return `<tr class="${excluded?'excluded':''}">
-      <td style="color:var(--muted2)">${start+i+1}</td>
+    const note = t.note ? ` <span style="color:var(--text3);font-size:10px">${t.note}</span>` : '';
+    return `<tr class="${excl?'excluded':''}">
+      <td style="color:var(--text3)">${start+i+1}</td>
       <td>${date}</td>
       <td>${sym}${note}</td>
       <td><span class="badge ${side.toLowerCase()}${t.isManual?' manual':''}">${side}${t.isManual?' ✎':''}</span></td>
       <td class="${pnl>=0?'pos':'neg'}">${f2(pnl)}</td>
-      <td>
-        <button class="btn sm" onclick="toggleExclude('${tid}')">${excluded?'↩':'✕'}</button>
-        ${t.isManual?`<button class="btn sm" onclick="deleteManual('${tid}')" style="margin-left:4px">🗑</button>`:''}
+      <td style="display:flex;gap:4px">
+        <button class="btn sm" onclick="toggleExclude('${tid}')" title="${excl?'Включить':'Исключить'}">${excl?'↩':'✕'}</button>
+        ${t.isManual?`<button class="btn sm" onclick="deleteManual('${tid}')">🗑</button>`:''}
       </td>
     </tr>`;
   }).join('');
 
   document.getElementById('trades-table').innerHTML = `
     <table class="trades-t">
-      <thead><tr><th>#</th><th>Дата</th><th>Пара</th><th>Сторона</th><th>P&L</th><th></th></tr></thead>
-      <tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:var(--muted2);padding:20px">Нет сделок</td></tr>'}</tbody>
+      <thead><tr><th>#</th><th>Дата</th><th>Пара</th><th>Тип</th><th>P&L / Сумма</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px">Нет записей за этот период</td></tr>'}</tbody>
     </table>`;
 
+  // Pagination
   const pag = document.getElementById('pagination');
   if (totalPages <= 1) { pag.innerHTML = ''; return; }
   let html = `<span class="page-info">${start+1}–${Math.min(start+PAGE_SIZE,total)} из ${total}</span>`;
   html += `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>←</button>`;
-  for (let p = 1; p <= totalPages; p++) {
+  for (let p=1; p<=totalPages; p++) {
     if (p===1||p===totalPages||(p>=currentPage-2&&p<=currentPage+2))
-      html += `<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+      html += `<button class="page-btn${p===currentPage?' active':''}" onclick="goPage(${p})">${p}</button>`;
     else if (p===currentPage-3||p===currentPage+3)
-      html += `<span style="color:var(--muted);font-size:11px">…</span>`;
+      html += `<span style="color:var(--text3)">…</span>`;
   }
   html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>→</button>`;
   pag.innerHTML = html;
@@ -753,20 +969,13 @@ function renderTable(trades) {
 function goPage(p) {
   const combined = [...allTrades,...manualTrades];
   const filtered = filterTrades(combined);
-  const tp = Math.max(1, Math.ceil(filtered.length/PAGE_SIZE));
-  if (p<1||p>tp) return;
-  currentPage = p;
+  const tp = Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
+  if(p<1||p>tp) return;
+  currentPage=p;
   renderTable(filtered);
-  document.querySelector('.card:last-child').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-// Set default filter button
-document.querySelectorAll('.fbtn').forEach(b => {
-  if (b.textContent === '2026') b.classList.add('active');
-  else b.classList.remove('active');
-});
-
 if (!WORKER_URL) {
   document.getElementById('setup-hint').style.display = 'block';
 } else {
