@@ -10,7 +10,7 @@
 :root {
   --bg:#0d0d0d; --surface:#141414; --surface2:#1a1a1a; --border:#242424;
   --accent:#7c6ff7; --accent2:#5b54d6; --green:#22c55e; --red:#ef4444;
-  --text:#f0f0f0; --muted:#555; --muted2:#888;
+  --yellow:#f59e0b; --text:#f0f0f0; --muted:#555; --muted2:#888;
   --mono:'JetBrains Mono',monospace; --sans:'Inter',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -28,18 +28,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .btn.primary:hover{background:var(--accent2)}
 .btn.sm{padding:3px 8px;font-size:11px}
 
-.main{padding:14px 20px;max-width:1400px;margin:0 auto}
+.main{padding:14px 20px;max-width:1500px;margin:0 auto}
 
-/* Config */
 .config-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;display:none}
 .config-panel.show{display:block}
-.config-row{display:flex;gap:10px;align-items:flex-end}
-.field{flex:1}.field label{display:block;font-size:11px;color:var(--muted2);margin-bottom:4px}
+.config-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.field{flex:1;min-width:120px}.field label{display:block;font-size:11px;color:var(--muted2);margin-bottom:4px}
 .field input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-family:var(--mono);font-size:12px}
 .field input:focus{outline:none;border-color:var(--accent)}
 .sec-title{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
 
-/* Filters */
 .filters{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
 .filter-label{font-size:11px;color:var(--muted2)}
 .fbtn{background:var(--surface);border:1px solid var(--border);color:var(--muted2);padding:4px 10px;border-radius:20px;cursor:pointer;font-size:11px;transition:all .15s;font-family:var(--sans)}
@@ -49,7 +47,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .date-range input:focus{outline:none;border-color:var(--accent)}
 .date-sep{color:var(--muted);font-size:11px}
 
-/* KPIs */
 .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
 .kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
 .kpi-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
@@ -57,17 +54,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .kpi-val.green{color:var(--green)}.kpi-val.red{color:var(--red)}.kpi-val.purple{color:var(--accent)}
 .kpi-sub{font-size:10px;color:var(--muted2);margin-top:3px;font-family:var(--mono)}
 
-/* Grid */
 .grid-2{display:grid;grid-template-columns:1fr 240px;gap:10px;margin-bottom:10px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
 .card-title{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
 
-/* Stats */
 .stat-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
 .stat-row:last-child{border-bottom:none}
 .stat-row .lbl{color:var(--muted2)}.stat-row .val{font-family:var(--mono);font-weight:500}
 
-/* Long/Short */
 .ls-wrap{display:flex;gap:10px;margin-bottom:10px}
 .ls-block{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
 .ls-type{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
@@ -78,13 +72,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .ls-num .ln{font-size:10px;color:var(--muted2);margin-bottom:2px}
 .ls-num .lv{font-family:var(--mono);font-size:12px;font-weight:600}
 
-/* Table */
+/* Monthly plan table */
+.monthly-table{width:100%;border-collapse:collapse;font-size:11px;overflow-x:auto;display:block}
+.monthly-table th{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);white-space:nowrap}
+.monthly-table td{padding:6px 8px;border-bottom:1px solid rgba(36,36,36,.5);font-family:var(--mono);white-space:nowrap}
+.monthly-table tr:last-child td{border-bottom:none}
+.monthly-table tr:hover td{background:var(--surface2)}
+.tag-plan{background:rgba(124,111,247,.15);color:var(--accent);padding:1px 5px;border-radius:3px;font-size:10px}
+.tag-ok{background:rgba(34,197,94,.15);color:var(--green);padding:1px 5px;border-radius:3px;font-size:10px}
+.tag-bad{background:rgba(239,68,68,.15);color:var(--red);padding:1px 5px;border-radius:3px;font-size:10px}
+.tag-cur{background:rgba(245,158,11,.15);color:var(--yellow);padding:1px 5px;border-radius:3px;font-size:10px}
+.tag-fut{color:var(--muted);font-size:10px}
+
 .table-wrap{overflow-y:auto;max-height:360px}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;text-align:left;padding:7px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface)}
-td{padding:6px 8px;border-bottom:1px solid rgba(36,36,36,.6);font-family:var(--mono)}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--surface2)}
+table.trades-t{width:100%;border-collapse:collapse;font-size:12px}
+table.trades-t th{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;text-align:left;padding:7px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface)}
+table.trades-t td{padding:6px 8px;border-bottom:1px solid rgba(36,36,36,.6);font-family:var(--mono)}
+table.trades-t tr:last-child td{border-bottom:none}
+table.trades-t tr:hover td{background:var(--surface2)}
 tr.excluded td{opacity:.35;text-decoration:line-through}
 .badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600}
 .badge.long{background:rgba(34,197,94,.15);color:var(--green)}
@@ -92,13 +97,12 @@ tr.excluded td{opacity:.35;text-decoration:line-through}
 .badge.manual{background:rgba(124,111,247,.15);color:var(--accent)}
 .pos{color:var(--green)}.neg{color:var(--red)}
 
-/* Pagination */
 .pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;flex-wrap:wrap}
 .page-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted2);padding:4px 9px;border-radius:5px;cursor:pointer;font-size:11px;font-family:var(--mono)}
 .page-btn:hover,.page-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.page-btn:disabled{opacity:.3;cursor:default}
 .page-info{font-size:11px;color:var(--muted2);font-family:var(--mono)}
 
-/* Add trade modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center}
 .modal-overlay.show{display:flex}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;width:340px}
@@ -110,7 +114,6 @@ tr.excluded td{opacity:.35;text-decoration:line-through}
 .modal-field select option{background:var(--surface)}
 .modal-btns{display:flex;gap:8px;margin-top:16px}
 
-/* Loading/Error */
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:10px;color:var(--muted2);font-size:12px;font-family:var(--mono)}
 .spinner{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -118,8 +121,10 @@ tr.excluded td{opacity:.35;text-decoration:line-through}
 .setup-box{background:rgba(124,111,247,.08);border:1px solid rgba(124,111,247,.2);border-radius:10px;padding:20px;text-align:center;margin-bottom:14px}
 .setup-box h2{font-size:15px;color:var(--accent);margin-bottom:5px}
 .setup-box p{font-size:12px;color:var(--muted2);margin-bottom:12px}
+.progress-bar{height:2px;background:var(--border);border-radius:1px;margin-top:6px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);transition:width .3s}
 
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 @media(max-width:900px){.kpi-row{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}.ls-wrap{flex-direction:column}}
 </style>
 </head>
@@ -137,12 +142,12 @@ tr.excluded td{opacity:.35;text-decoration:line-through}
 </div>
 
 <div class="main">
-  <!-- Config -->
   <div class="config-panel" id="config-panel">
     <div class="sec-title">Настройки подключения</div>
     <div class="config-row">
-      <div class="field"><label>URL Cloudflare Worker</label><input type="text" id="worker-url" placeholder="https://aged-sunset-5f55.dshelovnin.workers.dev"></div>
+      <div class="field"><label>URL Cloudflare Worker</label><input type="text" id="worker-url" placeholder="https://...workers.dev"></div>
       <div class="field" style="max-width:130px"><label>Стартовый капитал ($)</label><input type="number" id="start-capital" placeholder="3000"></div>
+      <div class="field" style="max-width:110px"><label>Рост в месяц (%)</label><input type="number" id="monthly-target" placeholder="20"></div>
       <button class="btn primary" onclick="saveConfig()">Сохранить</button>
     </div>
   </div>
@@ -153,10 +158,16 @@ tr.excluded td{opacity:.35;text-decoration:line-through}
     <button class="btn primary" onclick="toggleConfig()">⚙ Настройки</button>
   </div>
 
-  <!-- Filters -->
+  <!-- Loading progress -->
+  <div id="load-progress" style="display:none;margin-bottom:12px">
+    <div style="font-size:11px;color:var(--muted2);font-family:var(--mono);margin-bottom:4px" id="load-text">Загрузка сделок...</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
   <div class="filters">
     <span class="filter-label">Период:</span>
     <button class="fbtn active" onclick="setFilter('all',this)">Всё время</button>
+    <button class="fbtn" onclick="setFilter('2026',this)">2026</button>
     <button class="fbtn" onclick="setFilter('7d',this)">7 дней</button>
     <button class="fbtn" onclick="setFilter('30d',this)">30 дней</button>
     <button class="fbtn" onclick="setFilter('month',this)">Этот месяц</button>
@@ -167,7 +178,6 @@ tr.excluded td{opacity:.35;text-decoration:line-through}
     </div>
   </div>
 
-  <!-- KPIs -->
   <div class="kpi-row">
     <div class="kpi"><div class="kpi-label">Стартовый капитал</div><div class="kpi-val" id="kpi-start">—</div></div>
     <div class="kpi"><div class="kpi-label">Текущий капитал</div><div class="kpi-val purple" id="kpi-current">—</div></div>
@@ -176,7 +186,6 @@ tr.excluded td{opacity:.35;text-decoration:line-through}
     <div class="kpi"><div class="kpi-label">Ср. в день</div><div class="kpi-val" id="kpi-daily">—</div><div class="kpi-sub" id="kpi-per-trade"></div></div>
   </div>
 
-  <!-- Chart + Stats -->
   <div class="grid-2">
     <div class="card">
       <div class="card-title">Кривая P&L (накопленный)</div>
@@ -188,7 +197,12 @@ tr.excluded td{opacity:.35;text-decoration:line-through}
     </div>
   </div>
 
-  <!-- Long / Short -->
+  <!-- Monthly forecast -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-title">Прогноз роста капитала — план vs факт (×<span id="growth-rate-label">1.20</span>/мес)</div>
+    <div style="overflow-x:auto"><div id="monthly-table"><div class="loading"><div class="spinner"></div></div></div></div>
+  </div>
+
   <div class="ls-wrap">
     <div class="ls-block">
       <div class="ls-type">Long</div>
@@ -212,33 +226,26 @@ tr.excluded td{opacity:.35;text-decoration:line-through}
     </div>
   </div>
 
-  <!-- Trades table -->
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div class="card-title" style="margin-bottom:0">Журнал сделок</div>
+      <div class="card-title" style="margin-bottom:0">Журнал сделок <span id="trade-count-label" style="color:var(--muted2)"></span></div>
       <div style="display:flex;gap:6px;align-items:center">
         <span id="excluded-count" style="font-size:11px;color:var(--muted2)"></span>
         <button class="btn sm" onclick="clearExcluded()">Сбросить исключения</button>
       </div>
     </div>
-    <div class="table-wrap" id="trades-table">
-      <div class="loading"><div class="spinner"></div>Загрузка...</div>
-    </div>
+    <div class="table-wrap" id="trades-table"><div class="loading"><div class="spinner"></div>Загрузка...</div></div>
     <div class="pagination" id="pagination"></div>
   </div>
 </div>
 
-<!-- Add Trade Modal -->
 <div class="modal-overlay" id="modal" onclick="closeModal(event)">
   <div class="modal">
     <div class="modal-title">Добавить сделку вручную</div>
     <div class="modal-field"><label>Дата</label><input type="date" id="m-date"></div>
     <div class="modal-field"><label>Пара (необязательно)</label><input type="text" id="m-symbol" placeholder="BTC, ETH..."></div>
-    <div class="modal-field">
-      <label>Направление</label>
-      <select id="m-side"><option value="Buy">LONG</option><option value="Sell">SHORT</option></select>
-    </div>
-    <div class="modal-field"><label>P&L ($)</label><input type="number" id="m-pnl" placeholder="Например: 12.50 или -5.00" step="0.01"></div>
+    <div class="modal-field"><label>Направление</label><select id="m-side"><option value="Sell">LONG</option><option value="Buy">SHORT</option></select></div>
+    <div class="modal-field"><label>P&L ($)</label><input type="number" id="m-pnl" placeholder="12.50 или -5.00" step="0.01"></div>
     <div class="modal-field"><label>Заметка (необязательно)</label><input type="text" id="m-note" placeholder=""></div>
     <div class="modal-btns">
       <button class="btn primary" style="flex:1" onclick="addManualTrade()">Добавить</button>
@@ -250,12 +257,13 @@ tr.excluded td{opacity:.35;text-decoration:line-through}
 <script>
 let WORKER_URL = localStorage.getItem('worker_url') || '';
 let START_CAPITAL = parseFloat(localStorage.getItem('start_capital') || '3000');
+let MONTHLY_RATE = parseFloat(localStorage.getItem('monthly_rate') || '20') / 100;
 let chart = null;
-let allTrades = [];       // from bybit
-let manualTrades = [];    // user-added
+let allTrades = [];
+let manualTrades = JSON.parse(localStorage.getItem('manual_trades') || '[]');
 let excludedIds = new Set(JSON.parse(localStorage.getItem('excluded') || '[]'));
 let currentBalance = null;
-let activeFilter = 'all';
+let activeFilter = '2026';
 let currentPage = 1;
 const PAGE_SIZE = 25;
 
@@ -266,28 +274,23 @@ function toggleConfig() {
   if (p.classList.contains('show')) {
     document.getElementById('worker-url').value = WORKER_URL;
     document.getElementById('start-capital').value = START_CAPITAL;
+    document.getElementById('monthly-target').value = Math.round(MONTHLY_RATE * 100);
   }
 }
 
 function saveConfig() {
   WORKER_URL = document.getElementById('worker-url').value.trim().replace(/\/$/, '');
   START_CAPITAL = parseFloat(document.getElementById('start-capital').value) || 3000;
+  MONTHLY_RATE = (parseFloat(document.getElementById('monthly-target').value) || 20) / 100;
   localStorage.setItem('worker_url', WORKER_URL);
   localStorage.setItem('start_capital', START_CAPITAL);
+  localStorage.setItem('monthly_rate', Math.round(MONTHLY_RATE * 100));
   document.getElementById('config-panel').classList.remove('show');
   document.getElementById('setup-hint').style.display = 'none';
   loadData();
 }
 
 // ── Manual trades ─────────────────────────────────────────────────────────────
-function loadManualTrades() {
-  manualTrades = JSON.parse(localStorage.getItem('manual_trades') || '[]');
-}
-
-function saveManualTrades() {
-  localStorage.setItem('manual_trades', JSON.stringify(manualTrades));
-}
-
 function openAddTrade() {
   document.getElementById('m-date').value = new Date().toISOString().split('T')[0];
   document.getElementById('m-pnl').value = '';
@@ -295,19 +298,14 @@ function openAddTrade() {
   document.getElementById('m-note').value = '';
   document.getElementById('modal').classList.add('show');
 }
-
-function closeModal(e) {
-  if (e.target.id === 'modal') document.getElementById('modal').classList.remove('show');
-}
-
+function closeModal(e) { if (e.target.id === 'modal') document.getElementById('modal').classList.remove('show'); }
 function addManualTrade() {
   const pnl = parseFloat(document.getElementById('m-pnl').value);
   if (isNaN(pnl)) { alert('Введи P&L'); return; }
   const date = document.getElementById('m-date').value;
-  const ts = new Date(date).getTime();
   const trade = {
     id: 'manual_' + Date.now(),
-    updatedTime: String(ts),
+    updatedTime: String(new Date(date).getTime()),
     symbol: (document.getElementById('m-symbol').value.trim().toUpperCase() || 'MANUAL') + 'USDT',
     side: document.getElementById('m-side').value,
     closedPnl: String(pnl),
@@ -315,19 +313,22 @@ function addManualTrade() {
     isManual: true
   };
   manualTrades.push(trade);
-  saveManualTrades();
+  localStorage.setItem('manual_trades', JSON.stringify(manualTrades));
   document.getElementById('modal').classList.remove('show');
+  rerender();
+}
+function deleteManual(id) {
+  manualTrades = manualTrades.filter(t => t.id !== id);
+  localStorage.setItem('manual_trades', JSON.stringify(manualTrades));
   rerender();
 }
 
 // ── Excluded ──────────────────────────────────────────────────────────────────
 function toggleExclude(id) {
-  if (excludedIds.has(id)) excludedIds.delete(id);
-  else excludedIds.add(id);
+  if (excludedIds.has(id)) excludedIds.delete(id); else excludedIds.add(id);
   localStorage.setItem('excluded', JSON.stringify([...excludedIds]));
   rerender();
 }
-
 function clearExcluded() {
   excludedIds.clear();
   localStorage.setItem('excluded', '[]');
@@ -336,8 +337,7 @@ function clearExcluded() {
 
 // ── Filters ───────────────────────────────────────────────────────────────────
 function setFilter(type, btn) {
-  activeFilter = type;
-  currentPage = 1;
+  activeFilter = type; currentPage = 1;
   document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   rerender();
@@ -349,9 +349,10 @@ function filterTrades(trades) {
   const toInput = document.getElementById('date-to').value;
   return trades.filter(t => {
     const ts = parseInt(t.updatedTime);
+    if (activeFilter === '2026') { const d = new Date(ts); return d.getFullYear() === 2026; }
     if (activeFilter === '7d') return ts > now - 7*86400000;
     if (activeFilter === '30d') return ts > now - 30*86400000;
-    if (activeFilter === 'month') { const d=new Date();d.setDate(1);d.setHours(0,0,0,0);return ts>d.getTime(); }
+    if (activeFilter === 'month') { const d=new Date(); d.setDate(1); d.setHours(0,0,0,0); return ts>d.getTime(); }
     if (activeFilter === 'custom') {
       const from = fromInput ? new Date(fromInput).getTime() : 0;
       const to = toInput ? new Date(toInput).getTime() + 86400000 : Infinity;
@@ -361,45 +362,91 @@ function filterTrades(trades) {
   });
 }
 
-// ── API ───────────────────────────────────────────────────────────────────────
+// ── API — fetch ALL trades for 2026 in monthly chunks ────────────────────────
 async function callWorker(endpoint, params = {}) {
   const url = new URL(WORKER_URL);
   url.searchParams.set('endpoint', endpoint);
-  for (const [k,v] of Object.entries(params)) url.searchParams.set(k, v);
+  for (const [k,v] of Object.entries(params)) url.searchParams.set(k,v);
   const res = await fetch(url.toString());
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
-// Fetch all pages from Bybit (up to 1000 trades)
-async function fetchAllTrades() {
-  let all = [];
-  let cursor = '';
-  for (let i = 0; i < 10; i++) {
-    const params = { category: 'linear', limit: 100 };
-    if (cursor) params.cursor = cursor;
-    const data = await callWorker('/v5/position/closed-pnl', params);
-    if (data.retCode !== 0) throw new Error(data.retMsg || 'Ошибка API Bybit');
-    const list = data.result.list || [];
-    all = all.concat(list);
-    cursor = data.result.nextPageCursor || '';
-    if (!cursor || list.length < 100) break;
+// Fetch one page with cursor pagination
+async function fetchPage(startTime, endTime, cursor) {
+  const params = { category: 'linear', limit: 100, startTime: String(startTime), endTime: String(endTime) };
+  if (cursor) params.cursor = cursor;
+  return callWorker('/v5/position/closed-pnl', params);
+}
+
+// Fetch all trades from Jan 1 2026 until now, month by month
+async function fetchAllTrades2026() {
+  const yearStart = new Date('2026-01-01T00:00:00Z').getTime();
+  const now = Date.now();
+  const all = [];
+
+  // Build monthly chunks
+  const chunks = [];
+  let cur = yearStart;
+  while (cur < now) {
+    const d = new Date(cur);
+    const nextMonth = new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime();
+    const end = Math.min(nextMonth - 1, now);
+    chunks.push({ start: cur, end });
+    cur = nextMonth;
   }
+
+  const total = chunks.length;
+  for (let ci = 0; ci < chunks.length; ci++) {
+    const { start, end } = chunks[ci];
+    const pct = Math.round((ci / total) * 90);
+    setProgress(pct, `Загрузка ${new Date(start).toLocaleString('ru',{month:'long'})} ${new Date(start).getFullYear()}...`);
+
+    let cursor = '';
+    let page = 0;
+    while (true) {
+      const data = await fetchPage(start, end, cursor);
+      if (data.retCode !== 0) break;
+      const list = data.result?.list || [];
+      all.push(...list);
+      cursor = data.result?.nextPageCursor || '';
+      page++;
+      if (!cursor || list.length < 100 || page > 20) break;
+    }
+    // Small delay to avoid rate limit
+    await new Promise(r => setTimeout(r, 80));
+  }
+
+  setProgress(100, `Загружено ${all.length} сделок`);
   return all;
+}
+
+function setProgress(pct, text) {
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('load-text').textContent = text;
 }
 
 async function loadData() {
   if (!WORKER_URL) { document.getElementById('setup-hint').style.display = 'block'; return; }
+
+  document.getElementById('load-progress').style.display = 'block';
   document.getElementById('stats-content').innerHTML = '<div class="loading"><div class="spinner"></div>Загрузка...</div>';
   document.getElementById('trades-table').innerHTML = '<div class="loading"><div class="spinner"></div>Загрузка...</div>';
+  document.getElementById('monthly-table').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
   try {
-    allTrades = await fetchAllTrades();
+    allTrades = await fetchAllTrades2026();
+
     try {
       const wd = await callWorker('/v5/account/wallet-balance', { accountType: 'UNIFIED' });
       if (wd.retCode === 0) currentBalance = parseFloat(wd.result.list[0]?.totalEquity || 0);
     } catch(e) {}
+
+    document.getElementById('load-progress').style.display = 'none';
     rerender();
     document.getElementById('last-update').textContent = new Date().toLocaleTimeString('ru');
   } catch(e) {
+    document.getElementById('load-progress').style.display = 'none';
     document.getElementById('trades-table').innerHTML = `<div class="error-box">Ошибка: ${e.message}</div>`;
     document.getElementById('stats-content').innerHTML = `<div class="error-box">Проверь Worker и ключи</div>`;
   }
@@ -408,41 +455,132 @@ async function loadData() {
 function rerender() {
   const combined = [...allTrades, ...manualTrades];
   const filtered = filterTrades(combined);
-  renderDashboard(filtered, currentBalance);
+  renderDashboard(filtered, currentBalance, combined);
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 const f2 = n => (parseFloat(n) >= 0 ? '+' : '') + parseFloat(n).toFixed(2);
+const fUSD = n => '$' + parseFloat(n).toFixed(2);
 
-function renderDashboard(trades, balance) {
-  // Sort asc for chart
+// ── Monthly forecast ──────────────────────────────────────────────────────────
+function renderMonthly(allCombined) {
+  const rate = MONTHLY_RATE;
+  document.getElementById('growth-rate-label').textContent = (1 + rate).toFixed(2);
+
+  // Group all trades by month
+  const byMonth = {};
+  for (const t of allCombined) {
+    if (excludedIds.has(t.id || t.orderId)) continue;
+    const d = new Date(parseInt(t.updatedTime));
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    byMonth[key] = (byMonth[key] || 0) + parseFloat(t.closedPnl);
+  }
+
+  // Build months from Jan 2026 to Dec 2026
+  const months = [];
+  for (let m = 1; m <= 12; m++) {
+    months.push(`2026-${String(m).padStart(2,'0')}`);
+  }
+
+  const now = new Date();
+  const curKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+  let planCap = START_CAPITAL;
+  let rows = '';
+  for (const key of months) {
+    const [yr, mo] = key.split('-');
+    const monthName = new Date(parseInt(yr), parseInt(mo)-1, 1)
+      .toLocaleString('ru', { month: 'long', year: 'numeric' });
+
+    const planProfit = planCap * rate;
+    const planEnd = planCap * (1 + rate);
+    const fact = byMonth[key];
+    const hasFact = fact !== undefined;
+
+    let statusTag = '';
+    let factCell = '—';
+    let deviationCell = '—';
+    let factEndCell = '—';
+
+    if (key < curKey) {
+      // Past month
+      if (hasFact) {
+        const dev = fact - planProfit;
+        const devPct = (dev / planProfit * 100).toFixed(1);
+        factCell = `<span class="${fact>=0?'pos':'neg'}">${f2(fact)}</span>`;
+        deviationCell = `<span class="${dev>=0?'pos':'neg'}">${f2(dev)} (${dev>=0?'+':''}${devPct}%)</span>`;
+        factEndCell = fUSD(planCap + fact);
+        statusTag = fact >= planProfit
+          ? `<span class="tag-ok">✓ Выполнен</span>`
+          : `<span class="tag-bad">✗ Не выполнен</span>`;
+      } else {
+        statusTag = `<span class="tag-bad">нет данных</span>`;
+      }
+    } else if (key === curKey) {
+      // Current month
+      if (hasFact) {
+        const dev = fact - planProfit;
+        const devPct = (dev / planProfit * 100).toFixed(1);
+        factCell = `<span class="${fact>=0?'pos':'neg'}">${f2(fact)}</span>`;
+        deviationCell = `<span class="${dev>=0?'pos':'neg'}">${f2(dev)} (${dev>=0?'+':''}${devPct}%)</span>`;
+        factEndCell = fUSD(planCap + fact);
+      }
+      statusTag = `<span class="tag-cur">▶ Текущий</span>`;
+    } else {
+      // Future
+      statusTag = `<span class="tag-fut">— прогноз</span>`;
+    }
+
+    rows += `<tr>
+      <td>${monthName}</td>
+      <td>${statusTag}</td>
+      <td>${fUSD(planCap)}</td>
+      <td class="pos">+${fUSD(planProfit)}</td>
+      <td>${fUSD(planEnd)}</td>
+      <td>${factCell}</td>
+      <td>${factEndCell}</td>
+      <td>${deviationCell}</td>
+    </tr>`;
+
+    planCap = planEnd;
+  }
+
+  document.getElementById('monthly-table').innerHTML = `
+    <table class="monthly-table">
+      <thead><tr>
+        <th>Месяц</th><th>Статус</th>
+        <th>Капитал (нач)</th><th>План прибыль</th><th>Капитал (план)</th>
+        <th>Факт прибыль</th><th>Капитал (факт)</th><th>Отклонение</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ── Main render ───────────────────────────────────────────────────────────────
+function renderDashboard(trades, balance, allCombined) {
   const sorted = [...trades].sort((a,b) => parseInt(a.updatedTime) - parseInt(b.updatedTime));
 
-  // Compute stats — exclude excluded trades from calculations
-  let totalPnl = 0, wins = 0, losses = 0;
+  let totalPnl=0, wins=0, losses=0;
   let longCnt=0,longW=0,longProfit=0,longLoss=0;
   let shortCnt=0,shortW=0,shortProfit=0,shortLoss=0;
   const daily = {};
-  // Chart: pnl starts from 0, accumulates
   const chartPnl = [0];
-  const chartLabels = [];
-  const chartPoints = []; // {x, label, pnl, cum}
-
+  const chartPoints = [];
   let cum = 0;
+
   for (const t of sorted) {
     const pnl = parseFloat(t.closedPnl);
     const excluded = excludedIds.has(t.id || t.orderId);
     const date = new Date(parseInt(t.updatedTime)).toLocaleDateString('ru');
-
     cum += excluded ? 0 : pnl;
     chartPnl.push(+cum.toFixed(2));
-    chartPoints.push({ date, pnl, cum: +cum.toFixed(2), sym: t.symbol });
+    chartPoints.push({ date, pnl, cum: +cum.toFixed(2), sym: t.symbol, excluded });
 
     if (!excluded) {
       totalPnl += pnl;
       if (pnl >= 0) wins++; else losses++;
       daily[date] = (daily[date] || 0) + pnl;
-      if (t.side === 'Buy') { longCnt++; if(pnl>=0){longW++;longProfit+=pnl;}else longLoss+=pnl; }
+      if (t.side === 'Sell') { longCnt++; if(pnl>=0){longW++;longProfit+=pnl;}else longLoss+=pnl; }
       else { shortCnt++; if(pnl>=0){shortW++;shortProfit+=pnl;}else shortLoss+=pnl; }
     }
   }
@@ -454,7 +592,6 @@ function renderDashboard(trades, balance) {
   const avgT = total ? totalPnl / total : 0;
   const curCap = balance || (START_CAPITAL + totalPnl);
 
-  // KPIs
   document.getElementById('kpi-start').textContent = '$' + START_CAPITAL.toLocaleString();
   document.getElementById('kpi-current').textContent = '$' + curCap.toFixed(0);
   const pEl = document.getElementById('kpi-pnl');
@@ -466,9 +603,9 @@ function renderDashboard(trades, balance) {
   const dEl = document.getElementById('kpi-daily');
   dEl.textContent = f2(avgD);
   dEl.className = 'kpi-val ' + (avgD >= 0 ? 'green' : 'red');
-  document.getElementById('kpi-per-trade').textContent = f2(avgT) + ' / сделку';
+  document.getElementById('kpi-per-trade').textContent = f2(avgT) + ' / сд';
+  document.getElementById('trade-count-label').textContent = `(${trades.length})`;
 
-  // Stats
   const dVals = Object.values(daily);
   document.getElementById('stats-content').innerHTML = `
     <div class="stat-row"><span class="lbl">Дней торгов</span><span class="val">${days}</span></div>
@@ -479,7 +616,6 @@ function renderDashboard(trades, balance) {
     <div class="stat-row"><span class="lbl">Лучший день</span><span class="val pos">${dVals.length ? f2(Math.max(...dVals)) : '—'}</span></div>
     <div class="stat-row"><span class="lbl">Худший день</span><span class="val neg">${dVals.length ? f2(Math.min(...dVals)) : '—'}</span></div>`;
 
-  // Long/Short
   document.getElementById('ls-long-cnt').textContent = longCnt;
   document.getElementById('ls-long-wr').textContent = longCnt ? (longW/longCnt*100).toFixed(0)+'% винрейт':'';
   document.getElementById('ls-long-profit').textContent = '+$'+longProfit.toFixed(2);
@@ -496,13 +632,12 @@ function renderDashboard(trades, balance) {
   spEl.textContent = f2(shortProfit+shortLoss);
   spEl.className = 'lv '+((shortProfit+shortLoss)>=0?'pos':'neg');
 
-  // Chart — compact, starts from 0, points on hover
+  // Chart
   if (chart) chart.destroy();
   const ctx = document.getElementById('chart').getContext('2d');
   const grad = ctx.createLinearGradient(0,0,0,130);
   grad.addColorStop(0,'rgba(124,111,247,0.2)');
   grad.addColorStop(1,'rgba(124,111,247,0)');
-
   chart = new Chart(ctx, {
     type: 'line',
     data: {
@@ -512,71 +647,59 @@ function renderDashboard(trades, balance) {
         borderColor: '#7c6ff7',
         backgroundColor: grad,
         borderWidth: 1.5,
-        pointRadius: chartPnl.map((_,i) => i === 0 ? 0 : 2),
+        pointRadius: chartPnl.map((_,i) => i===0 ? 0 : 2),
         pointBackgroundColor: chartPnl.map((v,i) => {
-          if (i === 0) return 'transparent';
+          if (i===0) return 'transparent';
           const p = parseFloat(chartPoints[i-1]?.pnl || 0);
-          return p >= 0 ? 'rgba(34,197,94,0.7)' : 'rgba(239,68,68,0.7)';
+          return p >= 0 ? 'rgba(34,197,94,0.8)' : 'rgba(239,68,68,0.8)';
         }),
         pointHoverRadius: 5,
-        fill: true,
-        tension: 0.3,
+        fill: true, tension: 0.3,
       }]
     },
     options: {
       responsive: true,
-      interaction: { mode: 'index', intersect: false },
+      interaction: { mode:'index', intersect:false },
       plugins: {
-        legend: { display: false },
+        legend: { display:false },
         tooltip: {
-          backgroundColor: '#1a1a1a',
-          borderColor: '#333',
-          borderWidth: 1,
-          titleColor: '#888',
-          bodyColor: '#f0f0f0',
-          titleFont: { family: 'JetBrains Mono', size: 10 },
-          bodyFont: { family: 'JetBrains Mono', size: 12 },
+          backgroundColor:'#1a1a1a', borderColor:'#333', borderWidth:1,
+          titleColor:'#888', bodyColor:'#f0f0f0',
+          titleFont:{family:'JetBrains Mono',size:10},
+          bodyFont:{family:'JetBrains Mono',size:12},
           callbacks: {
             title: ctx => {
               const i = ctx[0].dataIndex;
-              if (i === 0) return 'Старт';
+              if (i===0) return 'Старт';
               const pt = chartPoints[i-1];
-              return pt ? pt.date + ' · ' + pt.sym?.replace('USDT','') : '';
+              return pt ? pt.date + ' · ' + (pt.sym||'').replace('USDT','') : '';
             },
             label: ctx => {
               const i = ctx.dataIndex;
-              const cum = ctx.parsed.y;
-              if (i === 0) return 'P&L: $0.00';
+              if (i===0) return 'P&L: $0.00';
               const pt = chartPoints[i-1];
-              const tradePnl = pt ? parseFloat(pt.pnl) : 0;
-              return [
-                'Сделка: ' + (tradePnl >= 0 ? '+' : '') + tradePnl.toFixed(2),
-                'Накоплено: ' + (cum >= 0 ? '+' : '') + cum.toFixed(2)
-              ];
+              const tp = pt ? parseFloat(pt.pnl) : 0;
+              return ['Сделка: '+(tp>=0?'+':'')+tp.toFixed(2), 'Накоплено: '+(ctx.parsed.y>=0?'+':'')+ctx.parsed.y.toFixed(2)];
             }
           }
         }
       },
       scales: {
-        x: { display: false },
-        y: {
-          grid: { color: 'rgba(36,36,36,1)' },
-          ticks: { color:'#555', font:{family:'JetBrains Mono',size:10}, callback: v => (v>=0?'+':'')+v }
-        }
+        x: { display:false },
+        y: { grid:{color:'rgba(36,36,36,1)'}, ticks:{color:'#555',font:{family:'JetBrains Mono',size:10},callback:v=>(v>=0?'+':'')+v} }
       }
     }
   });
 
-  // Table with pagination
   renderTable(trades);
+  renderMonthly(allCombined || [...allTrades, ...manualTrades]);
 
-  // Excluded count
-  const excCount = [...excludedIds].filter(id => trades.some(t => (t.id||t.orderId) === id)).length;
+  const excCount = [...excludedIds].filter(id => trades.some(t=>(t.id||t.orderId)===id)).length;
   document.getElementById('excluded-count').textContent = excCount ? `Исключено: ${excCount}` : '';
 }
 
 function renderTable(trades) {
-  const sorted = [...trades].sort((a,b) => parseInt(b.updatedTime) - parseInt(a.updatedTime));
+  const sorted = [...trades].sort((a,b) => parseInt(b.updatedTime)-parseInt(a.updatedTime));
   const total = sorted.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   if (currentPage > totalPages) currentPage = totalPages;
@@ -586,11 +709,11 @@ function renderTable(trades) {
   const rows = page.map((t, i) => {
     const pnl = parseFloat(t.closedPnl);
     const date = new Date(parseInt(t.updatedTime)).toLocaleDateString('ru');
-    const side = t.side === 'Buy' ? 'LONG' : 'SHORT';
+    const side = t.side === 'Sell' ? 'LONG' : 'SHORT';
     const tid = t.id || t.orderId;
     const excluded = excludedIds.has(tid);
-    const sym = t.symbol.replace('USDT','');
-    const note = t.note ? `<span style="color:var(--muted2);font-size:10px"> ${t.note}</span>` : '';
+    const sym = (t.symbol||'').replace('USDT','');
+    const note = t.note ? ` <span style="color:var(--muted2);font-size:10px">${t.note}</span>` : '';
     return `<tr class="${excluded?'excluded':''}">
       <td style="color:var(--muted2)">${start+i+1}</td>
       <td>${date}</td>
@@ -598,59 +721,49 @@ function renderTable(trades) {
       <td><span class="badge ${side.toLowerCase()}${t.isManual?' manual':''}">${side}${t.isManual?' ✎':''}</span></td>
       <td class="${pnl>=0?'pos':'neg'}">${f2(pnl)}</td>
       <td>
-        <button class="btn sm" onclick="toggleExclude('${tid}')" title="${excluded?'Включить':'Исключить из графика'}">
-          ${excluded ? '↩ Вкл' : '✕ Искл'}
-        </button>
-        ${t.isManual ? `<button class="btn sm" onclick="deleteManual('${tid}')" style="margin-left:4px">🗑</button>` : ''}
+        <button class="btn sm" onclick="toggleExclude('${tid}')">${excluded?'↩':'✕'}</button>
+        ${t.isManual?`<button class="btn sm" onclick="deleteManual('${tid}')" style="margin-left:4px">🗑</button>`:''}
       </td>
     </tr>`;
   }).join('');
 
   document.getElementById('trades-table').innerHTML = `
-    <table>
-      <thead><tr><th>#</th><th>Дата</th><th>Пара</th><th>Сторона</th><th>P&L</th><th>Действие</th></tr></thead>
-      <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:var(--muted2);padding:20px">Нет сделок</td></tr>'}</tbody>
+    <table class="trades-t">
+      <thead><tr><th>#</th><th>Дата</th><th>Пара</th><th>Сторона</th><th>P&L</th><th></th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:var(--muted2);padding:20px">Нет сделок</td></tr>'}</tbody>
     </table>`;
 
-  // Pagination
   const pag = document.getElementById('pagination');
   if (totalPages <= 1) { pag.innerHTML = ''; return; }
-
   let html = `<span class="page-info">${start+1}–${Math.min(start+PAGE_SIZE,total)} из ${total}</span>`;
   html += `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>←</button>`;
-
-  // Show limited page buttons
-  const range = 2;
   for (let p = 1; p <= totalPages; p++) {
-    if (p === 1 || p === totalPages || (p >= currentPage-range && p <= currentPage+range)) {
+    if (p===1||p===totalPages||(p>=currentPage-2&&p<=currentPage+2))
       html += `<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
-    } else if (p === currentPage-range-1 || p === currentPage+range+1) {
-      html += `<span style="color:var(--muted2);font-size:11px">…</span>`;
-    }
+    else if (p===currentPage-3||p===currentPage+3)
+      html += `<span style="color:var(--muted);font-size:11px">…</span>`;
   }
-
   html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>→</button>`;
   pag.innerHTML = html;
 }
 
 function goPage(p) {
-  const combined = [...allTrades, ...manualTrades];
+  const combined = [...allTrades,...manualTrades];
   const filtered = filterTrades(combined);
-  const total = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  if (p < 1 || p > totalPages) return;
+  const tp = Math.max(1, Math.ceil(filtered.length/PAGE_SIZE));
+  if (p<1||p>tp) return;
   currentPage = p;
   renderTable(filtered);
-}
-
-function deleteManual(id) {
-  manualTrades = manualTrades.filter(t => t.id !== id);
-  saveManualTrades();
-  rerender();
+  document.querySelector('.card:last-child').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-loadManualTrades();
+// Set default filter button
+document.querySelectorAll('.fbtn').forEach(b => {
+  if (b.textContent === '2026') b.classList.add('active');
+  else b.classList.remove('active');
+});
+
 if (!WORKER_URL) {
   document.getElementById('setup-hint').style.display = 'block';
 } else {
