@@ -7,378 +7,120 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
-
 :root {
-  --bg: #0d0d0d;
-  --surface: #141414;
-  --surface2: #1a1a1a;
-  --border: #242424;
-  --accent: #7c6ff7;
-  --accent2: #5b54d6;
-  --green: #22c55e;
-  --red: #ef4444;
-  --text: #f0f0f0;
-  --muted: #555;
-  --muted2: #888;
-  --mono: 'JetBrains Mono', monospace;
-  --sans: 'Inter', sans-serif;
+  --bg:#0d0d0d; --surface:#141414; --surface2:#1a1a1a; --border:#242424;
+  --accent:#7c6ff7; --accent2:#5b54d6; --green:#22c55e; --red:#ef4444;
+  --text:#f0f0f0; --muted:#555; --muted2:#888;
+  --mono:'JetBrains Mono',monospace; --sans:'Inter',sans-serif;
 }
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.logo{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.05em}
+.header-right{display:flex;align-items:center;gap:8px}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.ts{font-size:11px;color:var(--muted2);font-family:var(--mono)}
+.btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted2);padding:5px 11px;border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:12px;transition:all .15s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.primary:hover{background:var(--accent2)}
+.btn.sm{padding:3px 8px;font-size:11px}
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--sans);
-  min-height: 100vh;
-  font-size: 13px;
-}
+.main{padding:14px 20px;max-width:1400px;margin:0 auto}
 
-/* Header */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.logo {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent);
-  letter-spacing: 0.05em;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.status-dot {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--green);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-
-.status-text {
-  font-size: 11px;
-  color: var(--muted2);
-  font-family: var(--mono);
-}
-
-.btn {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--muted2);
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-family: var(--sans);
-  font-size: 12px;
-  transition: all 0.15s;
-}
-
-.btn:hover { border-color: var(--accent); color: var(--accent); }
-.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-.btn.primary:hover { background: var(--accent2); }
-
-/* Main layout */
-.main { padding: 16px 20px; max-width: 1400px; margin: 0 auto; }
-
-/* Config panel */
-.config-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px;
-  margin-bottom: 16px;
-  display: none;
-}
-
-.config-panel.show { display: block; }
-
-.config-title {
-  font-size: 11px;
-  color: var(--muted2);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 12px;
-}
-
-.config-row {
-  display: flex;
-  gap: 10px;
-  align-items: flex-end;
-}
-
-.field { flex: 1; }
-.field label { display: block; font-size: 11px; color: var(--muted2); margin-bottom: 5px; }
-.field input {
-  width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 7px 10px;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 12px;
-}
-.field input:focus { outline: none; border-color: var(--accent); }
+/* Config */
+.config-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;display:none}
+.config-panel.show{display:block}
+.config-row{display:flex;gap:10px;align-items:flex-end}
+.field{flex:1}.field label{display:block;font-size:11px;color:var(--muted2);margin-bottom:4px}
+.field input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-family:var(--mono);font-size:12px}
+.field input:focus{outline:none;border-color:var(--accent)}
+.sec-title{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
 
 /* Filters */
-.filters {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-  align-items: center;
-}
+.filters{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.filter-label{font-size:11px;color:var(--muted2)}
+.fbtn{background:var(--surface);border:1px solid var(--border);color:var(--muted2);padding:4px 10px;border-radius:20px;cursor:pointer;font-size:11px;transition:all .15s;font-family:var(--sans)}
+.fbtn:hover,.fbtn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.date-range{display:flex;gap:5px;align-items:center;margin-left:auto}
+.date-range input{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:11px;font-family:var(--mono);cursor:pointer}
+.date-range input:focus{outline:none;border-color:var(--accent)}
+.date-sep{color:var(--muted);font-size:11px}
 
-.filter-label { font-size: 11px; color: var(--muted2); margin-right: 4px; }
-
-.filter-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--muted2);
-  padding: 5px 10px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 11px;
-  transition: all 0.15s;
-  font-family: var(--sans);
-}
-
-.filter-btn:hover, .filter-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-}
-
-.date-range {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  margin-left: auto;
-}
-
-.date-range input {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 5px 8px;
-  color: var(--text);
-  font-size: 11px;
-  font-family: var(--mono);
-  cursor: pointer;
-}
-
-.date-range input:focus { outline: none; border-color: var(--accent); }
-
-.date-sep { color: var(--muted); font-size: 11px; }
-
-/* KPI row */
-.kpi-row {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.kpi {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px;
-}
-
-.kpi-label {
-  font-size: 10px;
-  color: var(--muted2);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 8px;
-}
-
-.kpi-val {
-  font-family: var(--mono);
-  font-size: 22px;
-  font-weight: 600;
-  line-height: 1;
-  color: var(--text);
-}
-
-.kpi-val.green { color: var(--green); }
-.kpi-val.red { color: var(--red); }
-.kpi-val.purple { color: var(--accent); }
-
-.kpi-sub {
-  font-size: 10px;
-  color: var(--muted2);
-  margin-top: 4px;
-  font-family: var(--mono);
-}
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
+.kpi-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.kpi-val{font-family:var(--mono);font-size:20px;font-weight:600;line-height:1}
+.kpi-val.green{color:var(--green)}.kpi-val.red{color:var(--red)}.kpi-val.purple{color:var(--accent)}
+.kpi-sub{font-size:10px;color:var(--muted2);margin-top:3px;font-family:var(--mono)}
 
 /* Grid */
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 260px;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.grid-2b {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px;
-}
-
-.card-title {
-  font-size: 10px;
-  color: var(--muted2);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 12px;
-}
+.grid-2{display:grid;grid-template-columns:1fr 240px;gap:10px;margin-bottom:10px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
+.card-title{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
 
 /* Stats */
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 7px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 12px;
-}
-
-.stat-row:last-child { border-bottom: none; }
-.stat-row .lbl { color: var(--muted2); }
-.stat-row .val { font-family: var(--mono); font-weight: 500; }
+.stat-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
+.stat-row:last-child{border-bottom:none}
+.stat-row .lbl{color:var(--muted2)}.stat-row .val{font-family:var(--mono);font-weight:500}
 
 /* Long/Short */
-.ls-wrap {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.ls-block {
-  flex: 1;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px;
-}
-
-.ls-type { font-size: 10px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-.ls-count { font-family: var(--mono); font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 2px; }
-.ls-count.long { color: var(--green); }
-.ls-count.short { color: var(--red); }
-.ls-wr { font-size: 11px; color: var(--muted2); margin-bottom: 12px; }
-
-.ls-nums { display: flex; gap: 12px; }
-.ls-num .ln { font-size: 10px; color: var(--muted2); margin-bottom: 3px; }
-.ls-num .lv { font-family: var(--mono); font-size: 12px; font-weight: 600; }
+.ls-wrap{display:flex;gap:10px;margin-bottom:10px}
+.ls-block{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
+.ls-type{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.ls-count{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1;margin-bottom:2px}
+.ls-count.long{color:var(--green)}.ls-count.short{color:var(--red)}
+.ls-wr{font-size:11px;color:var(--muted2);margin-bottom:10px}
+.ls-nums{display:flex;gap:10px}
+.ls-num .ln{font-size:10px;color:var(--muted2);margin-bottom:2px}
+.ls-num .lv{font-family:var(--mono);font-size:12px;font-weight:600}
 
 /* Table */
-.table-wrap { overflow-y: auto; max-height: 340px; }
+.table-wrap{overflow-y:auto;max-height:360px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;text-align:left;padding:7px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface)}
+td{padding:6px 8px;border-bottom:1px solid rgba(36,36,36,.6);font-family:var(--mono)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface2)}
+tr.excluded td{opacity:.35;text-decoration:line-through}
+.badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600}
+.badge.long{background:rgba(34,197,94,.15);color:var(--green)}
+.badge.short{background:rgba(239,68,68,.15);color:var(--red)}
+.badge.manual{background:rgba(124,111,247,.15);color:var(--accent)}
+.pos{color:var(--green)}.neg{color:var(--red)}
 
-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-th {
-  font-size: 10px;
-  color: var(--muted2);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  text-align: left;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  background: var(--surface);
-}
+/* Pagination */
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;flex-wrap:wrap}
+.page-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted2);padding:4px 9px;border-radius:5px;cursor:pointer;font-size:11px;font-family:var(--mono)}
+.page-btn:hover,.page-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.page-info{font-size:11px;color:var(--muted2);font-family:var(--mono)}
 
-td { padding: 7px 10px; border-bottom: 1px solid rgba(36,36,36,0.6); font-family: var(--mono); }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: var(--surface2); }
+/* Add trade modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;width:340px}
+.modal-title{font-size:14px;font-weight:600;margin-bottom:16px}
+.modal-field{margin-bottom:12px}
+.modal-field label{display:block;font-size:11px;color:var(--muted2);margin-bottom:4px}
+.modal-field input,.modal-field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:13px}
+.modal-field input:focus,.modal-field select:focus{outline:none;border-color:var(--accent)}
+.modal-field select option{background:var(--surface)}
+.modal-btns{display:flex;gap:8px;margin-top:16px}
 
-.badge {
-  display: inline-block;
-  padding: 1px 6px;
-  border-radius: 3px;
-  font-size: 10px;
-  font-weight: 600;
-}
-.badge.long { background: rgba(34,197,94,.15); color: var(--green); }
-.badge.short { background: rgba(239,68,68,.15); color: var(--red); }
+/* Loading/Error */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:10px;color:var(--muted2);font-size:12px;font-family:var(--mono)}
+.spinner{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:10px;color:var(--red);font-size:12px;font-family:var(--mono)}
+.setup-box{background:rgba(124,111,247,.08);border:1px solid rgba(124,111,247,.2);border-radius:10px;padding:20px;text-align:center;margin-bottom:14px}
+.setup-box h2{font-size:15px;color:var(--accent);margin-bottom:5px}
+.setup-box p{font-size:12px;color:var(--muted2);margin-bottom:12px}
 
-.pos { color: var(--green); }
-.neg { color: var(--red); }
-
-/* Loading / Error */
-.loading {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; padding: 40px; gap: 12px;
-  color: var(--muted2); font-size: 12px; font-family: var(--mono);
-}
-
-.spinner {
-  width: 24px; height: 24px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin .7s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.error-box {
-  background: rgba(239,68,68,.08);
-  border: 1px solid rgba(239,68,68,.2);
-  border-radius: 8px;
-  padding: 12px;
-  color: var(--red);
-  font-size: 12px;
-  font-family: var(--mono);
-}
-
-.setup-box {
-  background: rgba(124,111,247,.08);
-  border: 1px solid rgba(124,111,247,.2);
-  border-radius: 10px;
-  padding: 24px;
-  text-align: center;
-  margin-bottom: 16px;
-}
-
-.setup-box h2 { font-size: 16px; color: var(--accent); margin-bottom: 6px; }
-.setup-box p { font-size: 12px; color: var(--muted2); margin-bottom: 14px; }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-@media (max-width: 900px) {
-  .kpi-row { grid-template-columns: repeat(2, 1fr); }
-  .grid-2 { grid-template-columns: 1fr; }
-  .grid-2b { grid-template-columns: 1fr; }
-}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+@media(max-width:900px){.kpi-row{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}.ls-wrap{flex-direction:column}}
 </style>
 </head>
 <body>
@@ -386,45 +128,38 @@ tr:hover td { background: var(--surface2); }
 <div class="header">
   <div class="logo">◈ TRADING/DASHBOARD</div>
   <div class="header-right">
-    <div class="status-dot"></div>
-    <span class="status-text" id="last-update">—</span>
+    <div class="dot"></div>
+    <span class="ts" id="last-update">—</span>
+    <button class="btn" onclick="openAddTrade()">+ Сделка</button>
     <button class="btn" onclick="loadData()">↻ Обновить</button>
     <button class="btn" onclick="toggleConfig()">⚙ Настройки</button>
   </div>
 </div>
 
 <div class="main">
-
   <!-- Config -->
   <div class="config-panel" id="config-panel">
-    <div class="config-title">Настройки подключения</div>
+    <div class="sec-title">Настройки подключения</div>
     <div class="config-row">
-      <div class="field">
-        <label>URL Cloudflare Worker</label>
-        <input type="text" id="worker-url" placeholder="https://aged-sunset-5f55.dshelovnin.workers.dev">
-      </div>
-      <div class="field" style="max-width:140px">
-        <label>Стартовый капитал ($)</label>
-        <input type="number" id="start-capital" placeholder="3000">
-      </div>
+      <div class="field"><label>URL Cloudflare Worker</label><input type="text" id="worker-url" placeholder="https://aged-sunset-5f55.dshelovnin.workers.dev"></div>
+      <div class="field" style="max-width:130px"><label>Стартовый капитал ($)</label><input type="number" id="start-capital" placeholder="3000"></div>
       <button class="btn primary" onclick="saveConfig()">Сохранить</button>
     </div>
   </div>
 
-  <!-- Setup hint -->
   <div class="setup-box" id="setup-hint" style="display:none">
     <h2>Добро пожаловать</h2>
     <p>Укажи URL Cloudflare Worker для загрузки данных с Bybit</p>
-    <button class="btn primary" onclick="toggleConfig()">⚙ Открыть настройки</button>
+    <button class="btn primary" onclick="toggleConfig()">⚙ Настройки</button>
   </div>
 
   <!-- Filters -->
   <div class="filters">
     <span class="filter-label">Период:</span>
-    <button class="filter-btn active" onclick="setFilter('all',this)">Всё время</button>
-    <button class="filter-btn" onclick="setFilter('7d',this)">7 дней</button>
-    <button class="filter-btn" onclick="setFilter('30d',this)">30 дней</button>
-    <button class="filter-btn" onclick="setFilter('month',this)">Этот месяц</button>
+    <button class="fbtn active" onclick="setFilter('all',this)">Всё время</button>
+    <button class="fbtn" onclick="setFilter('7d',this)">7 дней</button>
+    <button class="fbtn" onclick="setFilter('30d',this)">30 дней</button>
+    <button class="fbtn" onclick="setFilter('month',this)">Этот месяц</button>
     <div class="date-range">
       <input type="date" id="date-from" onchange="setFilter('custom',null)">
       <span class="date-sep">—</span>
@@ -434,36 +169,18 @@ tr:hover td { background: var(--surface2); }
 
   <!-- KPIs -->
   <div class="kpi-row">
-    <div class="kpi">
-      <div class="kpi-label">Стартовый капитал</div>
-      <div class="kpi-val" id="kpi-start">—</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Текущий капитал</div>
-      <div class="kpi-val purple" id="kpi-current">—</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">P&L за период</div>
-      <div class="kpi-val" id="kpi-pnl">—</div>
-      <div class="kpi-sub" id="kpi-pnl-pct"></div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Винрейт</div>
-      <div class="kpi-val green" id="kpi-wr">—</div>
-      <div class="kpi-sub" id="kpi-trades"></div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Ср. в день</div>
-      <div class="kpi-val" id="kpi-daily">—</div>
-      <div class="kpi-sub" id="kpi-per-trade"></div>
-    </div>
+    <div class="kpi"><div class="kpi-label">Стартовый капитал</div><div class="kpi-val" id="kpi-start">—</div></div>
+    <div class="kpi"><div class="kpi-label">Текущий капитал</div><div class="kpi-val purple" id="kpi-current">—</div></div>
+    <div class="kpi"><div class="kpi-label">P&L за период</div><div class="kpi-val" id="kpi-pnl">—</div><div class="kpi-sub" id="kpi-pct"></div></div>
+    <div class="kpi"><div class="kpi-label">Винрейт</div><div class="kpi-val green" id="kpi-wr">—</div><div class="kpi-sub" id="kpi-trades"></div></div>
+    <div class="kpi"><div class="kpi-label">Ср. в день</div><div class="kpi-val" id="kpi-daily">—</div><div class="kpi-sub" id="kpi-per-trade"></div></div>
   </div>
 
   <!-- Chart + Stats -->
   <div class="grid-2">
     <div class="card">
-      <div class="card-title">Кривая капитала</div>
-      <canvas id="chart" height="180"></canvas>
+      <div class="card-title">Кривая P&L (накопленный)</div>
+      <canvas id="chart" height="110"></canvas>
     </div>
     <div class="card">
       <div class="card-title">Статистика</div>
@@ -497,21 +214,50 @@ tr:hover td { background: var(--surface2); }
 
   <!-- Trades table -->
   <div class="card">
-    <div class="card-title">Журнал сделок</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="card-title" style="margin-bottom:0">Журнал сделок</div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span id="excluded-count" style="font-size:11px;color:var(--muted2)"></span>
+        <button class="btn sm" onclick="clearExcluded()">Сбросить исключения</button>
+      </div>
+    </div>
     <div class="table-wrap" id="trades-table">
       <div class="loading"><div class="spinner"></div>Загрузка...</div>
     </div>
+    <div class="pagination" id="pagination"></div>
   </div>
+</div>
 
+<!-- Add Trade Modal -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title">Добавить сделку вручную</div>
+    <div class="modal-field"><label>Дата</label><input type="date" id="m-date"></div>
+    <div class="modal-field"><label>Пара (необязательно)</label><input type="text" id="m-symbol" placeholder="BTC, ETH..."></div>
+    <div class="modal-field">
+      <label>Направление</label>
+      <select id="m-side"><option value="Buy">LONG</option><option value="Sell">SHORT</option></select>
+    </div>
+    <div class="modal-field"><label>P&L ($)</label><input type="number" id="m-pnl" placeholder="Например: 12.50 или -5.00" step="0.01"></div>
+    <div class="modal-field"><label>Заметка (необязательно)</label><input type="text" id="m-note" placeholder=""></div>
+    <div class="modal-btns">
+      <button class="btn primary" style="flex:1" onclick="addManualTrade()">Добавить</button>
+      <button class="btn" onclick="document.getElementById('modal').classList.remove('show')">Отмена</button>
+    </div>
+  </div>
 </div>
 
 <script>
 let WORKER_URL = localStorage.getItem('worker_url') || '';
 let START_CAPITAL = parseFloat(localStorage.getItem('start_capital') || '3000');
 let chart = null;
-let allTrades = [];
+let allTrades = [];       // from bybit
+let manualTrades = [];    // user-added
+let excludedIds = new Set(JSON.parse(localStorage.getItem('excluded') || '[]'));
 let currentBalance = null;
 let activeFilter = 'all';
+let currentPage = 1;
+const PAGE_SIZE = 25;
 
 // ── Config ────────────────────────────────────────────────────────────────────
 function toggleConfig() {
@@ -533,27 +279,79 @@ function saveConfig() {
   loadData();
 }
 
+// ── Manual trades ─────────────────────────────────────────────────────────────
+function loadManualTrades() {
+  manualTrades = JSON.parse(localStorage.getItem('manual_trades') || '[]');
+}
+
+function saveManualTrades() {
+  localStorage.setItem('manual_trades', JSON.stringify(manualTrades));
+}
+
+function openAddTrade() {
+  document.getElementById('m-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('m-pnl').value = '';
+  document.getElementById('m-symbol').value = '';
+  document.getElementById('m-note').value = '';
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal(e) {
+  if (e.target.id === 'modal') document.getElementById('modal').classList.remove('show');
+}
+
+function addManualTrade() {
+  const pnl = parseFloat(document.getElementById('m-pnl').value);
+  if (isNaN(pnl)) { alert('Введи P&L'); return; }
+  const date = document.getElementById('m-date').value;
+  const ts = new Date(date).getTime();
+  const trade = {
+    id: 'manual_' + Date.now(),
+    updatedTime: String(ts),
+    symbol: (document.getElementById('m-symbol').value.trim().toUpperCase() || 'MANUAL') + 'USDT',
+    side: document.getElementById('m-side').value,
+    closedPnl: String(pnl),
+    note: document.getElementById('m-note').value,
+    isManual: true
+  };
+  manualTrades.push(trade);
+  saveManualTrades();
+  document.getElementById('modal').classList.remove('show');
+  rerender();
+}
+
+// ── Excluded ──────────────────────────────────────────────────────────────────
+function toggleExclude(id) {
+  if (excludedIds.has(id)) excludedIds.delete(id);
+  else excludedIds.add(id);
+  localStorage.setItem('excluded', JSON.stringify([...excludedIds]));
+  rerender();
+}
+
+function clearExcluded() {
+  excludedIds.clear();
+  localStorage.setItem('excluded', '[]');
+  rerender();
+}
+
 // ── Filters ───────────────────────────────────────────────────────────────────
 function setFilter(type, btn) {
   activeFilter = type;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  currentPage = 1;
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  if (allTrades.length) renderDashboard(filterTrades(allTrades), currentBalance);
+  rerender();
 }
 
 function filterTrades(trades) {
   const now = Date.now();
   const fromInput = document.getElementById('date-from').value;
   const toInput = document.getElementById('date-to').value;
-
   return trades.filter(t => {
     const ts = parseInt(t.updatedTime);
     if (activeFilter === '7d') return ts > now - 7*86400000;
     if (activeFilter === '30d') return ts > now - 30*86400000;
-    if (activeFilter === 'month') {
-      const d = new Date(); d.setDate(1); d.setHours(0,0,0,0);
-      return ts > d.getTime();
-    }
+    if (activeFilter === 'month') { const d=new Date();d.setDate(1);d.setHours(0,0,0,0);return ts>d.getTime(); }
     if (activeFilter === 'custom') {
       const from = fromInput ? new Date(fromInput).getTime() : 0;
       const to = toInput ? new Date(toInput).getTime() + 86400000 : Infinity;
@@ -572,24 +370,34 @@ async function callWorker(endpoint, params = {}) {
   return res.json();
 }
 
+// Fetch all pages from Bybit (up to 1000 trades)
+async function fetchAllTrades() {
+  let all = [];
+  let cursor = '';
+  for (let i = 0; i < 10; i++) {
+    const params = { category: 'linear', limit: 100 };
+    if (cursor) params.cursor = cursor;
+    const data = await callWorker('/v5/position/closed-pnl', params);
+    if (data.retCode !== 0) throw new Error(data.retMsg || 'Ошибка API Bybit');
+    const list = data.result.list || [];
+    all = all.concat(list);
+    cursor = data.result.nextPageCursor || '';
+    if (!cursor || list.length < 100) break;
+  }
+  return all;
+}
+
 async function loadData() {
   if (!WORKER_URL) { document.getElementById('setup-hint').style.display = 'block'; return; }
-
   document.getElementById('stats-content').innerHTML = '<div class="loading"><div class="spinner"></div>Загрузка...</div>';
   document.getElementById('trades-table').innerHTML = '<div class="loading"><div class="spinner"></div>Загрузка...</div>';
-
   try {
-    const data = await callWorker('/v5/position/closed-pnl', { category: 'linear', limit: 200 });
-    if (data.retCode !== 0) throw new Error(data.retMsg || 'Ошибка API Bybit');
-
-    allTrades = data.result.list || [];
-
+    allTrades = await fetchAllTrades();
     try {
       const wd = await callWorker('/v5/account/wallet-balance', { accountType: 'UNIFIED' });
       if (wd.retCode === 0) currentBalance = parseFloat(wd.result.list[0]?.totalEquity || 0);
     } catch(e) {}
-
-    renderDashboard(filterTrades(allTrades), currentBalance);
+    rerender();
     document.getElementById('last-update').textContent = new Date().toLocaleTimeString('ru');
   } catch(e) {
     document.getElementById('trades-table').innerHTML = `<div class="error-box">Ошибка: ${e.message}</div>`;
@@ -597,26 +405,46 @@ async function loadData() {
   }
 }
 
+function rerender() {
+  const combined = [...allTrades, ...manualTrades];
+  const filtered = filterTrades(combined);
+  renderDashboard(filtered, currentBalance);
+}
+
 // ── Render ────────────────────────────────────────────────────────────────────
 const f2 = n => (parseFloat(n) >= 0 ? '+' : '') + parseFloat(n).toFixed(2);
 
 function renderDashboard(trades, balance) {
+  // Sort asc for chart
   const sorted = [...trades].sort((a,b) => parseInt(a.updatedTime) - parseInt(b.updatedTime));
 
-  let cum = START_CAPITAL, totalPnl = 0, wins = 0, losses = 0;
-  let longCnt = 0, longW = 0, longProfit = 0, longLoss = 0;
-  let shortCnt = 0, shortW = 0, shortProfit = 0, shortLoss = 0;
-  const daily = {}, chartData = [START_CAPITAL];
+  // Compute stats — exclude excluded trades from calculations
+  let totalPnl = 0, wins = 0, losses = 0;
+  let longCnt=0,longW=0,longProfit=0,longLoss=0;
+  let shortCnt=0,shortW=0,shortProfit=0,shortLoss=0;
+  const daily = {};
+  // Chart: pnl starts from 0, accumulates
+  const chartPnl = [0];
+  const chartLabels = [];
+  const chartPoints = []; // {x, label, pnl, cum}
 
+  let cum = 0;
   for (const t of sorted) {
     const pnl = parseFloat(t.closedPnl);
+    const excluded = excludedIds.has(t.id || t.orderId);
     const date = new Date(parseInt(t.updatedTime)).toLocaleDateString('ru');
-    totalPnl += pnl; cum += pnl;
-    chartData.push(+cum.toFixed(2));
-    if (pnl >= 0) wins++; else losses++;
-    daily[date] = (daily[date] || 0) + pnl;
-    if (t.side === 'Buy') { longCnt++; if(pnl>=0){longW++;longProfit+=pnl;}else longLoss+=pnl; }
-    else { shortCnt++; if(pnl>=0){shortW++;shortProfit+=pnl;}else shortLoss+=pnl; }
+
+    cum += excluded ? 0 : pnl;
+    chartPnl.push(+cum.toFixed(2));
+    chartPoints.push({ date, pnl, cum: +cum.toFixed(2), sym: t.symbol });
+
+    if (!excluded) {
+      totalPnl += pnl;
+      if (pnl >= 0) wins++; else losses++;
+      daily[date] = (daily[date] || 0) + pnl;
+      if (t.side === 'Buy') { longCnt++; if(pnl>=0){longW++;longProfit+=pnl;}else longLoss+=pnl; }
+      else { shortCnt++; if(pnl>=0){shortW++;shortProfit+=pnl;}else shortLoss+=pnl; }
+    }
   }
 
   const total = wins + losses;
@@ -632,7 +460,7 @@ function renderDashboard(trades, balance) {
   const pEl = document.getElementById('kpi-pnl');
   pEl.textContent = f2(totalPnl);
   pEl.className = 'kpi-val ' + (totalPnl >= 0 ? 'green' : 'red');
-  document.getElementById('kpi-pnl-pct').textContent = ((totalPnl/START_CAPITAL)*100).toFixed(1) + '%';
+  document.getElementById('kpi-pct').textContent = ((totalPnl/START_CAPITAL)*100).toFixed(1) + '% от депозита';
   document.getElementById('kpi-wr').textContent = wr + '%';
   document.getElementById('kpi-trades').textContent = total + ' сд · ' + wins + '↑ ' + losses + '↓';
   const dEl = document.getElementById('kpi-daily');
@@ -641,91 +469,188 @@ function renderDashboard(trades, balance) {
   document.getElementById('kpi-per-trade').textContent = f2(avgT) + ' / сделку';
 
   // Stats
+  const dVals = Object.values(daily);
   document.getElementById('stats-content').innerHTML = `
     <div class="stat-row"><span class="lbl">Дней торгов</span><span class="val">${days}</span></div>
     <div class="stat-row"><span class="lbl">Всего сделок</span><span class="val">${total}</span></div>
     <div class="stat-row"><span class="lbl">Плюс / Минус</span><span class="val">${wins} / ${losses}</span></div>
     <div class="stat-row"><span class="lbl">Винрейт</span><span class="val" style="color:var(--green)">${wr}%</span></div>
     <div class="stat-row"><span class="lbl">P&L к депозиту</span><span class="val" style="color:${totalPnl>=0?'var(--green)':'var(--red)'}">${((totalPnl/START_CAPITAL)*100).toFixed(1)}%</span></div>
-    <div class="stat-row"><span class="lbl">Лучший день</span><span class="val pos">${f2(Math.max(...Object.values(daily)))}</span></div>
-    <div class="stat-row"><span class="lbl">Худший день</span><span class="val neg">${f2(Math.min(...Object.values(daily)))}</span></div>`;
+    <div class="stat-row"><span class="lbl">Лучший день</span><span class="val pos">${dVals.length ? f2(Math.max(...dVals)) : '—'}</span></div>
+    <div class="stat-row"><span class="lbl">Худший день</span><span class="val neg">${dVals.length ? f2(Math.min(...dVals)) : '—'}</span></div>`;
 
   // Long/Short
   document.getElementById('ls-long-cnt').textContent = longCnt;
-  document.getElementById('ls-long-wr').textContent = longCnt ? (longW/longCnt*100).toFixed(0) + '% винрейт' : '';
-  document.getElementById('ls-long-profit').textContent = '+$' + longProfit.toFixed(2);
-  document.getElementById('ls-long-loss').textContent = '-$' + Math.abs(longLoss).toFixed(2);
+  document.getElementById('ls-long-wr').textContent = longCnt ? (longW/longCnt*100).toFixed(0)+'% винрейт':'';
+  document.getElementById('ls-long-profit').textContent = '+$'+longProfit.toFixed(2);
+  document.getElementById('ls-long-loss').textContent = '-$'+Math.abs(longLoss).toFixed(2);
   const lpEl = document.getElementById('ls-long-pnl');
   lpEl.textContent = f2(longProfit+longLoss);
-  lpEl.className = 'lv ' + ((longProfit+longLoss)>=0?'pos':'neg');
+  lpEl.className = 'lv '+((longProfit+longLoss)>=0?'pos':'neg');
 
   document.getElementById('ls-short-cnt').textContent = shortCnt;
-  document.getElementById('ls-short-wr').textContent = shortCnt ? (shortW/shortCnt*100).toFixed(0) + '% винрейт' : '';
-  document.getElementById('ls-short-profit').textContent = '+$' + shortProfit.toFixed(2);
-  document.getElementById('ls-short-loss').textContent = '-$' + Math.abs(shortLoss).toFixed(2);
+  document.getElementById('ls-short-wr').textContent = shortCnt ? (shortW/shortCnt*100).toFixed(0)+'% винрейт':'';
+  document.getElementById('ls-short-profit').textContent = '+$'+shortProfit.toFixed(2);
+  document.getElementById('ls-short-loss').textContent = '-$'+Math.abs(shortLoss).toFixed(2);
   const spEl = document.getElementById('ls-short-pnl');
   spEl.textContent = f2(shortProfit+shortLoss);
-  spEl.className = 'lv ' + ((shortProfit+shortLoss)>=0?'pos':'neg');
+  spEl.className = 'lv '+((shortProfit+shortLoss)>=0?'pos':'neg');
 
-  // Chart
+  // Chart — compact, starts from 0, points on hover
   if (chart) chart.destroy();
   const ctx = document.getElementById('chart').getContext('2d');
-  const grad = ctx.createLinearGradient(0,0,0,220);
-  grad.addColorStop(0,'rgba(124,111,247,0.25)');
+  const grad = ctx.createLinearGradient(0,0,0,130);
+  grad.addColorStop(0,'rgba(124,111,247,0.2)');
   grad.addColorStop(1,'rgba(124,111,247,0)');
+
   chart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: chartData.map((_,i)=>i),
+      labels: chartPnl.map((_,i) => i),
       datasets: [{
-        data: chartData,
+        data: chartPnl,
         borderColor: '#7c6ff7',
         backgroundColor: grad,
         borderWidth: 1.5,
-        pointRadius: 0,
+        pointRadius: chartPnl.map((_,i) => i === 0 ? 0 : 2),
+        pointBackgroundColor: chartPnl.map((v,i) => {
+          if (i === 0) return 'transparent';
+          const p = parseFloat(chartPoints[i-1]?.pnl || 0);
+          return p >= 0 ? 'rgba(34,197,94,0.7)' : 'rgba(239,68,68,0.7)';
+        }),
+        pointHoverRadius: 5,
         fill: true,
         tension: 0.3,
       }]
     },
     options: {
       responsive: true,
+      interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { display: false },
-        tooltip: { callbacks: { label: c => '$' + c.parsed.y.toFixed(2) } }
+        tooltip: {
+          backgroundColor: '#1a1a1a',
+          borderColor: '#333',
+          borderWidth: 1,
+          titleColor: '#888',
+          bodyColor: '#f0f0f0',
+          titleFont: { family: 'JetBrains Mono', size: 10 },
+          bodyFont: { family: 'JetBrains Mono', size: 12 },
+          callbacks: {
+            title: ctx => {
+              const i = ctx[0].dataIndex;
+              if (i === 0) return 'Старт';
+              const pt = chartPoints[i-1];
+              return pt ? pt.date + ' · ' + pt.sym?.replace('USDT','') : '';
+            },
+            label: ctx => {
+              const i = ctx.dataIndex;
+              const cum = ctx.parsed.y;
+              if (i === 0) return 'P&L: $0.00';
+              const pt = chartPoints[i-1];
+              const tradePnl = pt ? parseFloat(pt.pnl) : 0;
+              return [
+                'Сделка: ' + (tradePnl >= 0 ? '+' : '') + tradePnl.toFixed(2),
+                'Накоплено: ' + (cum >= 0 ? '+' : '') + cum.toFixed(2)
+              ];
+            }
+          }
+        }
       },
       scales: {
         x: { display: false },
         y: {
           grid: { color: 'rgba(36,36,36,1)' },
-          ticks: { color: '#555', font: { family: 'JetBrains Mono', size: 10 }, callback: v => '$'+v }
+          ticks: { color:'#555', font:{family:'JetBrains Mono',size:10}, callback: v => (v>=0?'+':'')+v }
         }
       }
     }
   });
 
-  // Table
-  const recent = [...trades].sort((a,b)=>parseInt(b.updatedTime)-parseInt(a.updatedTime)).slice(0,100);
-  const rows = recent.map((t,i) => {
+  // Table with pagination
+  renderTable(trades);
+
+  // Excluded count
+  const excCount = [...excludedIds].filter(id => trades.some(t => (t.id||t.orderId) === id)).length;
+  document.getElementById('excluded-count').textContent = excCount ? `Исключено: ${excCount}` : '';
+}
+
+function renderTable(trades) {
+  const sorted = [...trades].sort((a,b) => parseInt(b.updatedTime) - parseInt(a.updatedTime));
+  const total = sorted.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (currentPage > totalPages) currentPage = totalPages;
+  const start = (currentPage-1)*PAGE_SIZE;
+  const page = sorted.slice(start, start+PAGE_SIZE);
+
+  const rows = page.map((t, i) => {
     const pnl = parseFloat(t.closedPnl);
     const date = new Date(parseInt(t.updatedTime)).toLocaleDateString('ru');
-    const side = t.side==='Buy'?'LONG':'SHORT';
-    return `<tr>
-      <td style="color:var(--muted2)">${i+1}</td>
+    const side = t.side === 'Buy' ? 'LONG' : 'SHORT';
+    const tid = t.id || t.orderId;
+    const excluded = excludedIds.has(tid);
+    const sym = t.symbol.replace('USDT','');
+    const note = t.note ? `<span style="color:var(--muted2);font-size:10px"> ${t.note}</span>` : '';
+    return `<tr class="${excluded?'excluded':''}">
+      <td style="color:var(--muted2)">${start+i+1}</td>
       <td>${date}</td>
-      <td style="color:var(--text)">${t.symbol.replace('USDT','')}</td>
-      <td><span class="badge ${side.toLowerCase()}">${side}</span></td>
+      <td>${sym}${note}</td>
+      <td><span class="badge ${side.toLowerCase()}${t.isManual?' manual':''}">${side}${t.isManual?' ✎':''}</span></td>
       <td class="${pnl>=0?'pos':'neg'}">${f2(pnl)}</td>
+      <td>
+        <button class="btn sm" onclick="toggleExclude('${tid}')" title="${excluded?'Включить':'Исключить из графика'}">
+          ${excluded ? '↩ Вкл' : '✕ Искл'}
+        </button>
+        ${t.isManual ? `<button class="btn sm" onclick="deleteManual('${tid}')" style="margin-left:4px">🗑</button>` : ''}
+      </td>
     </tr>`;
   }).join('');
 
   document.getElementById('trades-table').innerHTML = `
     <table>
-      <thead><tr><th>#</th><th>Дата</th><th>Пара</th><th>Сторона</th><th>P&L</th></tr></thead>
-      <tbody>${rows}</tbody>
+      <thead><tr><th>#</th><th>Дата</th><th>Пара</th><th>Сторона</th><th>P&L</th><th>Действие</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:var(--muted2);padding:20px">Нет сделок</td></tr>'}</tbody>
     </table>`;
+
+  // Pagination
+  const pag = document.getElementById('pagination');
+  if (totalPages <= 1) { pag.innerHTML = ''; return; }
+
+  let html = `<span class="page-info">${start+1}–${Math.min(start+PAGE_SIZE,total)} из ${total}</span>`;
+  html += `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>←</button>`;
+
+  // Show limited page buttons
+  const range = 2;
+  for (let p = 1; p <= totalPages; p++) {
+    if (p === 1 || p === totalPages || (p >= currentPage-range && p <= currentPage+range)) {
+      html += `<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+    } else if (p === currentPage-range-1 || p === currentPage+range+1) {
+      html += `<span style="color:var(--muted2);font-size:11px">…</span>`;
+    }
+  }
+
+  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>→</button>`;
+  pag.innerHTML = html;
+}
+
+function goPage(p) {
+  const combined = [...allTrades, ...manualTrades];
+  const filtered = filterTrades(combined);
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  renderTable(filtered);
+}
+
+function deleteManual(id) {
+  manualTrades = manualTrades.filter(t => t.id !== id);
+  saveManualTrades();
+  rerender();
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
+loadManualTrades();
 if (!WORKER_URL) {
   document.getElementById('setup-hint').style.display = 'block';
 } else {
