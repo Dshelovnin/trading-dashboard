@@ -372,49 +372,37 @@ async function callWorker(endpoint, params = {}) {
   return res.json();
 }
 
-// Fetch one page with cursor pagination
-async function fetchPage(startTime, endTime, cursor) {
-  const params = { category: 'linear', limit: 100, startTime: String(startTime), endTime: String(endTime) };
-  if (cursor) params.cursor = cursor;
-  return callWorker('/v5/position/closed-pnl', params);
-}
-
-// Fetch all trades from Jan 1 2026 until now, month by month
+// Fetch ALL trades via cursor pagination
 async function fetchAllTrades2026() {
-  const yearStart = new Date('2026-01-01T00:00:00Z').getTime();
-  const now = Date.now();
   const all = [];
+  let cursor = '';
+  let page = 0;
+  const MAX_PAGES = 30;
 
-  // Build monthly chunks
-  const chunks = [];
-  let cur = yearStart;
-  while (cur < now) {
-    const d = new Date(cur);
-    const nextMonth = new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime();
-    const end = Math.min(nextMonth - 1, now);
-    chunks.push({ start: cur, end });
-    cur = nextMonth;
-  }
+  while (page < MAX_PAGES) {
+    const pct = Math.min(90, Math.round((page / MAX_PAGES) * 90));
+    setProgress(pct, `Загрузка сделок... (${all.length} загружено)`);
 
-  const total = chunks.length;
-  for (let ci = 0; ci < chunks.length; ci++) {
-    const { start, end } = chunks[ci];
-    const pct = Math.round((ci / total) * 90);
-    setProgress(pct, `Загрузка ${new Date(start).toLocaleString('ru',{month:'long'})} ${new Date(start).getFullYear()}...`);
+    const params = { category: 'linear', limit: 100 };
+    if (cursor) params.cursor = cursor;
 
-    let cursor = '';
-    let page = 0;
-    while (true) {
-      const data = await fetchPage(start, end, cursor);
-      if (data.retCode !== 0) break;
-      const list = data.result?.list || [];
-      all.push(...list);
-      cursor = data.result?.nextPageCursor || '';
-      page++;
-      if (!cursor || list.length < 100 || page > 20) break;
-    }
-    // Small delay to avoid rate limit
-    await new Promise(r => setTimeout(r, 80));
+    const data = await callWorker('/v5/position/closed-pnl', params);
+    if (data.retCode !== 0) { console.error('Bybit error:', data.retMsg); break; }
+
+    const list = data.result?.list || [];
+    if (list.length === 0) break;
+
+    all.push(...list);
+    cursor = data.result?.nextPageCursor || '';
+    page++;
+
+    if (!cursor) break;
+
+    // Stop if oldest trade in batch is before 2026
+    const oldest = list[list.length - 1];
+    if (oldest && new Date(parseInt(oldest.updatedTime)).getFullYear() < 2026) break;
+
+    await new Promise(r => setTimeout(r, 60));
   }
 
   setProgress(100, `Загружено ${all.length} сделок`);
