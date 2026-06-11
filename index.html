@@ -47,7 +47,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12
 .fld label{display:block;font-size:10px;color:var(--t3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.08em}
 .fld input{width:100%;background:var(--bg);border:1px solid var(--b);border-radius:5px;padding:5px 8px;color:var(--text);font-family:var(--mono);font-size:11px}
 .fld input:focus{outline:none;border-color:rgba(88,166,255,0.35)}
-.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
+.page-grid{display:grid;grid-template-columns:1fr 200px 240px;gap:8px;margin-bottom:10px}
+.page-left{display:flex;flex-direction:column;gap:8px;min-width:0}
+.page-right{display:flex;flex-direction:column;gap:8px}.page-right .card{flex:1;display:flex;flex-direction:column}.page-right .twrap{flex:1}
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .kpi{background:var(--c1);border:1px solid var(--b);border-radius:8px;padding:11px 13px}
 .kpi.ab{background:rgba(88,166,255,0.06);border-color:rgba(88,166,255,0.2)}
 .kpi.am{background:rgba(57,217,138,0.06);border-color:rgba(57,217,138,0.2)}
@@ -56,7 +59,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12
 .kpi-val{font-family:var(--mono);font-size:20px;font-weight:600;line-height:1;color:var(--text)}
 .kpi-val.mint{color:var(--mint)}.kpi-val.rose{color:var(--rose)}.kpi-val.blue{color:var(--blue)}
 .kpi-sub{font-size:10px;color:var(--t2);margin-top:3px;font-family:var(--mono)}
-.ls-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.ls-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .lsc{background:var(--c1);border:1px solid var(--b);border-radius:8px;padding:11px 13px;cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:14px}
 .lsc:hover{border-color:var(--bh)}
 .lsc.al{background:rgba(57,217,138,0.05);border-color:rgba(57,217,138,0.3)}
@@ -70,15 +73,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12
 .lnum .ln{font-size:10px;color:var(--t3);margin-bottom:1px}
 .lnum .lv{font-family:var(--mono);font-size:11px;font-weight:500}
 .ls-hint{font-size:10px;color:var(--blue);margin-left:4px}
-.mid{display:grid;grid-template-columns:1fr 185px 220px;gap:8px;margin-bottom:10px}
+.chart-card{flex:1}
 .card{background:var(--c1);border:1px solid var(--b);border-radius:8px;padding:11px 13px;transition:border-color .15s}
 .card:hover{border-color:var(--bh)}
-.ctitle{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.ctitle{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
 .ctgls{display:flex;gap:4px}
 .ctgl{background:transparent;border:1px solid var(--b);color:var(--t3);padding:2px 7px;border-radius:4px;cursor:pointer;font-size:10px;transition:all .12s}
 .ctgl:hover{color:var(--t2);border-color:var(--bh)}
 .ctgl.active{background:var(--blued);border-color:rgba(88,166,255,0.3);color:var(--blue)}
-.srow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:11px}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:11px}
 .srow:last-child{border-bottom:none}
 .srow .lb{color:var(--t2)}.srow .vl{font-family:var(--mono);font-weight:500;color:var(--text)}
 .wr-bar{height:2px;background:rgba(255,255,255,0.07);border-radius:1px;margin:5px 0 2px;overflow:hidden}
@@ -106,8 +109,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12
 .tnd{background:var(--rosed);color:var(--rose);padding:1px 6px;border-radius:4px;font-size:10px}
 .twrap{overflow-y:auto;max-height:320px}
 .ttbl{width:100%;border-collapse:collapse;font-size:11px}
-.ttbl th{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;text-align:left;padding:6px 8px;border-bottom:1px solid var(--b);position:sticky;top:0;background:var(--c1);font-weight:400}
-.ttbl td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,0.04);font-family:var(--mono);color:var(--text)}
+.ttbl th{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;text-align:left;padding:5px 7px;border-bottom:1px solid var(--b);position:sticky;top:0;background:var(--c1);font-weight:400}
+.ttbl td{padding:4px 7px;border-bottom:1px solid rgba(255,255,255,0.04);font-family:var(--mono);color:var(--text)}
 .ttbl tr:last-child td{border-bottom:none}
 .ttbl tr:hover td{background:rgba(255,255,255,0.02)}
 tr.excl td{opacity:.3;text-decoration:line-through}
@@ -144,8 +147,8 @@ tr.excl td{opacity:.3;text-decoration:line-through}
 .pgtxt{font-size:10px;color:var(--t2);font-family:var(--mono);margin-bottom:3px}
 .pgbar{height:1px;background:var(--b);overflow:hidden}
 .pgfill{height:100%;background:var(--blue);transition:width .3s}
-@media(max-width:1200px){.kpi-row{grid-template-columns:repeat(3,1fr)}.mid{grid-template-columns:1fr 185px}}
-@media(max-width:800px){.kpi-row{grid-template-columns:repeat(2,1fr)}.mid{grid-template-columns:1fr}.ls-row{grid-template-columns:1fr}.main{padding:8px}}
+@media(max-width:1200px){.kpi-row{grid-template-columns:repeat(3,1fr)}.page-grid{grid-template-columns:1fr 180px 200px}}
+@media(max-width:800px){.kpi-row{grid-template-columns:repeat(2,1fr)}.page-grid{grid-template-columns:1fr}.ls-row{grid-template-columns:1fr}.main{padding:8px}}
 </style>
 </head>
 <body>
@@ -193,6 +196,9 @@ tr.excl td{opacity:.3;text-decoration:line-through}
   <div class="pgbar"><div class="pgfill" id="pgfill" style="width:0%"></div></div>
 </div>
 
+<div class="page-grid">
+<div class="page-left">
+
 <div class="kpi-row">
   <div class="kpi"><div class="kpi-lbl">Стартовый капитал</div><div class="kpi-val" id="k-start">—</div></div>
   <div class="kpi ab"><div class="kpi-lbl">Текущий капитал</div><div class="kpi-val blue" id="k-cur">—</div></div>
@@ -228,36 +234,37 @@ tr.excl td{opacity:.3;text-decoration:line-through}
   </div>
 </div>
 
-<!-- Chart | Stats | Journal -->
-<div class="mid">
-  <div class="card">
-    <div class="ctitle">
-      Кривая капитала
-      <div class="ctgls">
-        <button class="ctgl active" onclick="setCM('pnl',this)">P&L</button>
-        <button class="ctgl" onclick="setCM('capital',this)">Капитал</button>
-        <button class="ctgl" onclick="setCM('daily',this)">По дням</button>
-        <button class="ctgl" onclick="setCM('heatmap',this)">Календарь</button>
-      </div>
+<div class="card chart-card">
+  <div class="ctitle">
+    Кривая капитала
+    <div class="ctgls">
+      <button class="ctgl active" onclick="setCM('pnl',this)">P&L</button>
+      <button class="ctgl" onclick="setCM('capital',this)">Капитал</button>
+      <button class="ctgl" onclick="setCM('daily',this)">По дням</button>
+      <button class="ctgl" onclick="setCM('heatmap',this)">Календарь</button>
     </div>
-    <div id="chart-area"><canvas id="chart" height="130"></canvas></div>
   </div>
-  <div class="card">
-    <div class="ctitle">Статистика</div>
-    <div id="stats"><div class="loading"><div class="spin"></div></div></div>
-  </div>
-  <div class="card" style="display:flex;flex-direction:column">
-    <div class="ctitle">
-      Журнал <span id="jcnt" style="color:var(--t3)"></span>
-      <div style="display:flex;gap:4px;align-items:center">
-        <span id="ecnt" style="font-size:10px;color:var(--t3)"></span>
-        <button class="btn sm" onclick="clearExcl()">↺</button>
-      </div>
-    </div>
-    <div class="twrap" id="jtbl" style="flex:1"><div class="loading"><div class="spin"></div></div></div>
-    <div class="pgn" id="pgn"></div>
-  </div>
+  <div id="chart-area"><canvas id="chart" height="200"></canvas></div>
 </div>
+
+</div><!-- /page-left -->
+<div class="card" style="display:flex;flex-direction:column;align-self:stretch">
+  <div class="ctitle">Статистика</div>
+  <div id="stats"><div class="loading"><div class="spin"></div></div></div>
+</div>
+
+<div class="card" style="display:flex;flex-direction:column;align-self:stretch">
+  <div class="ctitle">
+    Журнал <span id="jcnt" style="color:var(--t3)"></span>
+    <div style="display:flex;gap:4px;align-items:center">
+      <span id="ecnt" style="font-size:10px;color:var(--t3)"></span>
+      <button class="btn sm" onclick="clearExcl()">↺</button>
+    </div>
+  </div>
+  <div class="twrap" id="jtbl" style="flex:1;max-height:none"><div class="loading"><div class="spin"></div></div></div>
+  <div class="pgn" id="pgn"></div>
+</div>
+</div><!-- /page-grid -->
 
 <div class="ins-row" id="ins-row"></div>
 <div class="cf-row" id="cf-row" style="display:none"></div>
@@ -688,12 +695,12 @@ function renderTable(trades,filtCF){
     var date=new Date(parseInt(t.updatedTime)).toLocaleDateString('ru'),tid=t.id||t.orderId,ex=excl.has(tid);
     if(t._rt==='deposit'||t._rt==='withdrawal'){
       var isD=t._rt==='deposit';
-      return '<tr><td style="color:var(--t3)">'+(s+i+1)+'</td><td>'+date+'</td><td>\u2014</td><td><span class="bdg '+t._rt+'">'+(isD?'\u2193 \u0414\u0435\u043f':'\u2191 \u0412\u044b\u0432')+'</span></td><td class="'+(isD?'pos':'neg')+'">'+(isD?'+':'-')+'$'+t.amount.toFixed(2)+'</td><td>'+(t.note||'')+'</td><td><button class="btn sm" onclick="delCF(\''+tid+'\')">&#x2715;</button></td></tr>';
+      return '<tr><td style="color:var(--t3)">'+(s+i+1)+'</td><td>'+date+'</td><td>\u2014</td><td><span class="bdg '+t._rt+'">'+(isD?'\u2193 \u0414\u0435\u043f':'\u2191 \u0412\u044b\u0432')+'</span></td><td class="'+(isD?'pos':'neg')+'">'+(isD?'+':'-')+'$'+t.amount.toFixed(2)+'</td><td><button class="btn sm" onclick="delCF(\''+tid+'\')">&#x2715;</button></td></tr>';
     }
     var pnl=parseFloat(t.closedPnl),side=t.side==='Sell'?'LONG':'SHORT',sym=(t.symbol||'').replace('USDT','');
-    return '<tr class="'+(ex?'excl':'')+'"><td style="color:var(--t3)">'+(s+i+1)+'</td><td>'+date+'</td><td>'+sym+(t.note?' <span style="color:var(--t3);font-size:10px">'+t.note+'</span>':'')+'</td><td><span class="bdg '+side.toLowerCase()+(t.isManual?' manual':'')+'">'+side+(t.isManual?' \u270e':'')+'</span></td><td class="'+(pnl>=0?'pos':'neg')+'">'+f2(pnl)+'</td><td></td><td style="display:flex;gap:3px"><button class="btn sm" onclick="togX(\''+tid+'\')">'+(ex?'\u21a9':'\u2715')+'</button>'+(t.isManual?'<button class="btn sm" onclick="delM(\''+tid+'\')">&#x1f5d1;</button>':'')+'</td></tr>';
+    return '<tr class="'+(ex?'excl':'')+'"><td style="color:var(--t3)">'+(s+i+1)+'</td><td>'+date+'</td><td>'+sym+(t.note?' <span style="color:var(--t3);font-size:10px">'+t.note+'</span>':'')+'</td><td><span class="bdg '+side.toLowerCase()+(t.isManual?' manual':'')+'">'+side+(t.isManual?' \u270e':'')+'</span></td><td class="'+(pnl>=0?'pos':'neg')+'">'+f2(pnl)+'</td><td style="display:flex;gap:3px"><button class="btn sm" onclick="togX(\''+tid+'\')">'+(ex?'\u21a9':'\u2715')+'</button>'+(t.isManual?'<button class="btn sm" onclick="delM(\''+tid+'\')">&#x1f5d1;</button>':'')+'</td></tr>';
   }).join('');
-  document.getElementById('jtbl').innerHTML='<table class="ttbl"><thead><tr><th>#</th><th>\u0414\u0430\u0442\u0430</th><th>\u041f\u0430\u0440\u0430</th><th>\u0422\u0438\u043f</th><th>P&L</th><th>\u0417\u0430\u043c\u0435\u0442\u043a\u0430</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:16px">\u041d\u0435\u0442 \u0437\u0430\u043f\u0438\u0441\u0435\u0439</td></tr>')+'</tbody></table>';
+  document.getElementById('jtbl').innerHTML='<table class="ttbl"><thead><tr><th>#</th><th>\u0414\u0430\u0442\u0430</th><th>\u041f\u0430\u0440\u0430</th><th>\u0422\u0438\u043f</th><th>P&L</th><th>\u0417\u0430\u043c\u0435\u0442\u043a\u0430</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:16px">\u041d\u0435\u0442 \u0437\u0430\u043f\u0438\u0441\u0435\u0439</td></tr>')+'</tbody></table>';
   var pag=document.getElementById('pgn');if(tp<=1){pag.innerHTML='';return;}
   var h='<span class="pi">'+(s+1)+'\u2013'+Math.min(s+PG,tot)+' \u0438\u0437 '+tot+'</span>';
   h+='<button class="pb" onclick="gp('+(pg-1)+')" '+(pg===1?'disabled':'')+'>\u2190</button>';
