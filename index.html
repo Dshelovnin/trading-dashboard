@@ -324,6 +324,8 @@ var bybit=[],manuals=JSON.parse(localStorage.getItem('manuals')||'[]');
 var cflows=JSON.parse(localStorage.getItem('cflows')||'[]');
 var excl=new Set(JSON.parse(localStorage.getItem('excl')||'[]'));
 var wbal=null,filt='2026',curTab='trade',pg=1;
+var autoCF=[];
+function allCFitems(){return cflows.concat(autoCF);}
 var PG=25;
 
 function tick(){document.getElementById('clk').textContent=new Date().toLocaleTimeString('ru');}
@@ -448,6 +450,52 @@ async function fetchAll(){
   setPg(100,'Загружено '+all.size+' сделок');return {list:[...all.values()],err:lastErr,errCnt:errCnt};
 }
 
+async function fetchCF(){
+  var out=[],ys=new Date('2026-01-01T00:00:00Z').getTime(),W=29*86400000;
+  for(var s=ys;s<Date.now();s+=W){
+    var e=Math.min(s+W-1,Date.now());
+    // Депозиты (on-chain)
+    try{
+      var cur='';
+      for(var i=0;i<10;i++){
+        var p={startTime:String(s),endTime:String(e),limit:'50'};if(cur)p.cursor=cur;
+        var d=await apiCall('/v5/asset/deposit/query-record',p);
+        if(d.retCode!==0){if(d.retCode)console.error('deposit-record retCode',d.retCode,d.retMsg);break;}
+        ((d.result&&d.result.rows)||[]).forEach(function(r){
+          if(String(r.status)!=='3')return; // 3 = success
+          var amt=parseFloat(r.amount);if(!amt)return;
+          if(['USDT','USDC','DAI','USD'].indexOf((r.coin||'').toUpperCase())===-1)return;
+          var ts=parseInt(r.successAt||r.confirmedTime||0)||s;
+          out.push({id:'bbd_'+(r.txID||r.id||ts),type:'deposit',amount:amt,ts:ts,auto:true,note:'Bybit '+r.coin});
+        });
+        cur=(d.result&&d.result.nextPageCursor)||'';if(!cur)break;
+        await new Promise(function(r){setTimeout(r,50);});
+      }
+    }catch(err){console.error('deposit fetch fail:',err);}
+    // Выводы
+    try{
+      var cur2='';
+      for(var j=0;j<10;j++){
+        var p2={startTime:String(s),endTime:String(e),limit:'50'};if(cur2)p2.cursor=cur2;
+        var d2=await apiCall('/v5/asset/withdraw/query-record',p2);
+        if(d2.retCode!==0){if(d2.retCode)console.error('withdraw-record retCode',d2.retCode,d2.retMsg);break;}
+        ((d2.result&&d2.result.rows)||[]).forEach(function(r){
+          if((String(r.status||'')).toLowerCase()!=='success')return;
+          var amt=parseFloat(r.amount)+parseFloat(r.withdrawFee||0);if(!amt)return;
+          if(['USDT','USDC','DAI','USD'].indexOf((r.coin||'').toUpperCase())===-1)return;
+          var ts=parseInt(r.updateTime||r.createTime||0)||s;
+          out.push({id:'bbw_'+(r.txID||r.id||ts),type:'withdrawal',amount:amt,ts:ts,auto:true,note:'Bybit '+r.coin});
+        });
+        cur2=(d2.result&&d2.result.nextPageCursor)||'';if(!cur2)break;
+        await new Promise(function(r){setTimeout(r,50);});
+      }
+    }catch(err){console.error('withdraw fetch fail:',err);}
+    await new Promise(function(r){setTimeout(r,60);});
+  }
+  var m=new Map();out.forEach(function(c){m.set(c.id,c);});
+  return [...m.values()];
+}
+
 async function loadData(){
   if(!WU){document.getElementById('setup').style.display='block';return;}
   document.getElementById('pgwrap').style.display='block';
@@ -456,6 +504,8 @@ async function loadData(){
     var res=await fetchAll();
     bybit=res.list;
     try{var w=await apiCall('/v5/account/wallet-balance',{accountType:'UNIFIED'});if(w.retCode===0)wbal=parseFloat(w.result.list[0]&&w.result.list[0].totalEquity||0);}catch(e){console.error('wallet fail:',e);}
+    setPg(100,'Загрузка депозитов и выводов...');
+    try{autoCF=await fetchCF();}catch(e){console.error('cashflow fetch fail:',e);autoCF=[];}
     document.getElementById('pgwrap').style.display='none';
     if(res.err){
       eb.innerHTML='⚠ Ошибка загрузки с Bybit ('+res.errCnt+' запросов не прошло): <b>'+res.err+'</b><br>'+
@@ -477,7 +527,7 @@ function f2(n){return(parseFloat(n)>=0?'+':'')+parseFloat(n).toFixed(2);}
 function fu(n){return '$'+Math.abs(parseFloat(n)).toFixed(2);}
 
 function render(trades,bal,allTrades){
-  var filtCF=applyFilt(cflows.map(function(c){return Object.assign({},c,{updatedTime:String(c.ts)});}));
+  var filtCF=applyFilt(allCFitems().map(function(c){return Object.assign({},c,{updatedTime:String(c.ts)});}));
   var tl=[].concat(
     trades.map(function(t){return Object.assign({},t,{_t:'trade'});}),
     filtCF.map(function(c){return Object.assign({},c,{_t:c.type});})
@@ -516,8 +566,9 @@ function render(trades,bal,allTrades){
 
   var tot=wins+losses,wr=tot?(wins/tot*100).toFixed(1):0;
   var days=Math.max(Object.keys(daily).length,1),avgD=totalPnl/days,avgT=tot?totalPnl/tot:0;
-  var netFl=filtCF.reduce(function(s,c){return s+(c.type==='deposit'?c.amount:-c.amount);},0);
-  var curBal=(bal!==null?bal:(CAP+totalPnl))+netFl,pf=totL>0?(totP/totL).toFixed(2):'\u221e';
+  var netMan=filtCF.filter(function(c){return !c.auto;}).reduce(function(s,c){return s+(c.type==='deposit'?c.amount:-c.amount);},0);
+  var netAll=filtCF.reduce(function(s,c){return s+(c.type==='deposit'?c.amount:-c.amount);},0);
+  var curBal=(bal!==null?(bal+netMan):(CAP+totalPnl+netAll)),pf=totL>0?(totP/totL).toFixed(2):'\u221e';
   var avgWin=wins>0?(totP/wins).toFixed(2):0,avgLoss=losses>0?(totL/losses).toFixed(2):0;
   var dVals=Object.values(daily);
 
@@ -736,7 +787,7 @@ function renderTable(trades,filtCF){
     var date=new Date(parseInt(t.updatedTime)).toLocaleDateString('ru'),tid=t.id||t.orderId,ex=excl.has(tid);
     if(t._rt==='deposit'||t._rt==='withdrawal'){
       var isD=t._rt==='deposit';
-      return '<tr><td style="color:var(--t3)">'+(s+i+1)+'</td><td>'+date+'</td><td>\u2014</td><td><span class="bdg '+t._rt+'">'+(isD?'\u2193 \u0414\u0435\u043f':'\u2191 \u0412\u044b\u0432')+'</span></td><td class="'+(isD?'pos':'neg')+'">'+(isD?'+':'-')+'$'+t.amount.toFixed(2)+'</td><td><button class="btn sm" onclick="delCF(\''+tid+'\')">&#x2715;</button></td></tr>';
+      return '<tr><td style="color:var(--t3)">'+(s+i+1)+'</td><td>'+date+'</td><td>\u2014</td><td><span class="bdg '+t._rt+'">'+(isD?'\u2193 \u0414\u0435\u043f':'\u2191 \u0412\u044b\u0432')+(t.auto?' \u26a1':'')+'</span></td><td class="'+(isD?'pos':'neg')+'">'+(isD?'+':'-')+'$'+t.amount.toFixed(2)+'</td><td>'+(t.auto?'':'<button class="btn sm" onclick="delCF(\''+tid+'\')">&#x2715;</button>')+'</td></tr>';
     }
     var pnl=parseFloat(t.closedPnl),side=t.side==='Sell'?'LONG':'SHORT',sym=(t.symbol||'').replace('USDT','');
     return '<tr class="'+(ex?'excl':'')+'"><td style="color:var(--t3)">'+(s+i+1)+'</td><td>'+date+'</td><td>'+sym+(t.note?' <span style="color:var(--t3);font-size:10px">'+t.note+'</span>':'')+'</td><td><span class="bdg '+side.toLowerCase()+(t.isManual?' manual':'')+'">'+side+(t.isManual?' \u270e':'')+'</span></td><td class="'+(pnl>=0?'pos':'neg')+'">'+f2(pnl)+'</td><td style="display:flex;gap:3px"><button class="btn sm" onclick="togX(\''+tid+'\')">'+(ex?'\u21a9':'\u2715')+'</button>'+(t.isManual?'<button class="btn sm" onclick="delM(\''+tid+'\')">&#x1f5d1;</button>':'')+'</td></tr>';
@@ -749,7 +800,7 @@ function renderTable(trades,filtCF){
   h+='<button class="pb" onclick="gp('+(pg+1)+')" '+(pg===tp?'disabled':'')+'>\u2192</button>';
   pag.innerHTML=h;
 }
-function gp(p){var a=[].concat(bybit,manuals),f=applyFilt(a),tp=Math.max(1,Math.ceil(f.length/PG));if(p<1||p>tp)return;pg=p;renderTable(f,applyFilt(cflows.map(function(c){return Object.assign({},c,{updatedTime:String(c.ts)});})));}
+function gp(p){var a=[].concat(bybit,manuals),f=applyFilt(a),tp=Math.max(1,Math.ceil(f.length/PG));if(p<1||p>tp)return;pg=p;renderTable(f,applyFilt(allCFitems().map(function(c){return Object.assign({},c,{updatedTime:String(c.ts)});})));}
 
 if(!WU){document.getElementById('setup').style.display='block';}else{loadData();}
 </script>
