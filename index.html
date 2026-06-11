@@ -47,8 +47,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12
 .fld label{display:block;font-size:10px;color:var(--t3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.08em}
 .fld input{width:100%;background:var(--bg);border:1px solid var(--b);border-radius:5px;padding:5px 8px;color:var(--text);font-family:var(--mono);font-size:11px}
 .fld input:focus{outline:none;border-color:rgba(88,166,255,0.35)}
-.page-grid{display:grid;grid-template-columns:minmax(0,1fr) 260px 320px;gap:8px;margin-bottom:0;align-items:start}
+.page-grid{display:grid;grid-template-columns:minmax(0,1.3fr) 250px minmax(0,0.9fr);gap:8px;margin-bottom:10px;align-items:stretch}
 .page-left{display:flex;flex-direction:column;gap:8px;min-width:0}
+.page-mid{display:flex;flex-direction:column;gap:8px;min-width:0}
 .page-right{display:flex;flex-direction:column;gap:8px}.page-right .card{flex:1;display:flex;flex-direction:column}.page-right .twrap{flex:1}
 .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .kpi{background:var(--c1);border:1px solid var(--b);border-radius:8px;padding:11px 13px}
@@ -73,7 +74,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12
 .lnum .ln{font-size:10px;color:var(--t3);margin-bottom:1px}
 .lnum .lv{font-family:var(--mono);font-size:11px;font-weight:500}
 .ls-hint{font-size:10px;color:var(--blue);margin-left:4px}
-.chart-card{flex:1;min-height:300px}
+.chart-card{flex:1;display:flex;flex-direction:column;min-height:0}
+#chart-area{flex:1;position:relative;min-height:240px}
+#chart-area canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
 .card{background:var(--c1);border:1px solid var(--b);border-radius:8px;padding:11px 13px;transition:border-color .15s}
 .card:hover{border-color:var(--bh)}
 .ctitle{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
@@ -87,6 +90,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12
 .wr-bar{height:2px;background:rgba(255,255,255,0.07);border-radius:1px;margin:5px 0 2px;overflow:hidden}
 .wr-fill{height:100%;border-radius:1px;transition:width .4s;background:linear-gradient(90deg,var(--rose),var(--mint))}
 .ins-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:nowrap;overflow-x:auto}
+.ins-col{display:flex;flex-direction:column;gap:6px}
+.ins-col .ins-c{flex:none;width:100%}
 .ins-c{background:var(--c1);border:1px solid var(--b);border-radius:8px;padding:7px 10px;flex:1 1 0;min-width:0}
 .ins-c:hover{border-color:var(--bh)}
 .ins-lbl{font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;white-space:nowrap}
@@ -147,8 +152,8 @@ tr.excl td{opacity:.3;text-decoration:line-through}
 .pgtxt{font-size:10px;color:var(--t2);font-family:var(--mono);margin-bottom:3px}
 .pgbar{height:1px;background:var(--b);overflow:hidden}
 .pgfill{height:100%;background:var(--blue);transition:width .3s}
-@media(max-width:1300px){.kpi-row{grid-template-columns:repeat(5,1fr)}.page-grid{grid-template-columns:minmax(0,1fr) 240px 290px}}
-@media(max-width:800px){.kpi-row{grid-template-columns:repeat(2,1fr)}.page-grid{grid-template-columns:1fr}.ls-row{grid-template-columns:1fr}.main{padding:8px}}
+@media(max-width:1300px){.kpi-row{grid-template-columns:repeat(5,1fr)}.page-grid{grid-template-columns:minmax(0,1.2fr) 220px minmax(0,0.9fr)}}
+@media(max-width:800px){.kpi-row{grid-template-columns:repeat(2,1fr)}.page-grid{grid-template-columns:1fr}.ls-row{grid-template-columns:1fr}.main{padding:8px}#chart-area{min-height:220px}}
 </style>
 </head>
 <body>
@@ -248,12 +253,15 @@ tr.excl td{opacity:.3;text-decoration:line-through}
 </div>
 
 </div><!-- /page-left -->
-<div class="card" style="display:flex;flex-direction:column;align-self:start">
-  <div class="ctitle">Статистика</div>
-  <div id="stats"><div class="loading"><div class="spin"></div></div></div>
-</div>
+<div class="page-mid">
+  <div class="card" style="display:flex;flex-direction:column">
+    <div class="ctitle">Статистика</div>
+    <div id="stats"><div class="loading"><div class="spin"></div></div></div>
+  </div>
+  <div class="ins-col" id="ins-row"></div>
+</div><!-- /page-mid -->
 
-<div class="card" style="display:flex;flex-direction:column">
+<div class="card" style="display:flex;flex-direction:column;min-width:0">
   <div class="ctitle">
     Журнал <span id="jcnt" style="color:var(--t3)"></span>
     <div style="display:flex;gap:4px;align-items:center">
@@ -265,8 +273,6 @@ tr.excl td{opacity:.3;text-decoration:line-through}
   <div class="pgn" id="pgn"></div>
 </div>
 </div><!-- /page-grid -->
-
-<div id="ins-row" style="display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:10px;overflow-x:hidden"></div>
 
 <div class="card" style="margin-bottom:10px">
   <div class="ctitle">
@@ -536,16 +542,7 @@ function render(trades,bal,allTrades){
     '<div class="srow"><span class="lb">Лучший день</span><span class="vl pos">'+(dVals.length?f2(Math.max.apply(null,dVals)):'—')+'</span></div>'+
     '<div class="srow"><span class="lb">Худший день</span><span class="vl neg">'+(dVals.length?f2(Math.min.apply(null,dVals)):'—')+'</span></div>';
 
-  // Insights
-  var ins=[
-    {l:'Макс. просадка',v:'-$'+mxDD.toFixed(2),c:'neg',s:'от пика P&L'},
-    {l:'Profit Factor',v:pf,c:'blu',s:'прибыль / убыток'},
-    {l:'Ср. выигрыш',v:'+$'+avgWin,c:'pos',s:'на прибыльную сд'},
-    {l:'Ср. проигрыш',v:'-$'+avgLoss,c:'neg',s:'на убыточную сд'},
-    {l:'Риск / доход',v:avgLoss>0?(parseFloat(avgWin)/parseFloat(avgLoss)).toFixed(2):'\u221e',c:'blu',s:'win / loss'},
-    {l:'Сделок в день',v:(tot&&days?(tot/days).toFixed(1):'—'),c:'',s:'среднее'}
-  ];
-  // CF
+  // CF (must be computed BEFORE ins-row render)
   var depT=filtCF.filter(function(c){return c.type==='deposit';}).reduce(function(s,c){return s+c.amount;},0);
   var wdT=filtCF.filter(function(c){return c.type==='withdrawal';}).reduce(function(s,c){return s+c.amount;},0);
   var cfExtra='';
@@ -555,6 +552,16 @@ function render(trades,bal,allTrades){
       '<div class="ins-c"><div class="ins-lbl">Выводов</div><div class="ins-val neg">-$'+wdT.toFixed(2)+'</div><div class="ins-sub">&nbsp;</div></div>'+
       '<div class="ins-c"><div class="ins-lbl">Чистый поток</div><div class="ins-val '+(net>=0?'pos':'neg')+'">'+(net>=0?'+':'-')+'$'+Math.abs(net).toFixed(2)+'</div><div class="ins-sub">&nbsp;</div></div>';
   }
+
+  // Insights
+  var ins=[
+    {l:'Макс. просадка',v:'-$'+mxDD.toFixed(2),c:'neg',s:'от пика P&L'},
+    {l:'Profit Factor',v:pf,c:'blu',s:'прибыль / убыток'},
+    {l:'Ср. выигрыш',v:'+$'+avgWin,c:'pos',s:'на прибыльную сд'},
+    {l:'Ср. проигрыш',v:'-$'+avgLoss,c:'neg',s:'на убыточную сд'},
+    {l:'Риск / доход',v:avgLoss>0?(parseFloat(avgWin)/parseFloat(avgLoss)).toFixed(2):'\u221e',c:'blu',s:'win / loss'},
+    {l:'Сделок в день',v:(tot&&days?(tot/days).toFixed(1):'—'),c:'',s:'среднее'}
+  ];
   document.getElementById('ins-row').innerHTML=ins.map(function(d){
     return '<div class="ins-c"><div class="ins-lbl">'+d.l+'</div><div class="ins-val '+d.c+'">'+d.v+'</div><div class="ins-sub">'+d.s+'</div></div>';
   }).join('')+cfExtra;
@@ -573,7 +580,7 @@ function render(trades,bal,allTrades){
 function renderChart(cPnl,cCap,cPts,dmap){
   var area=document.getElementById('chart-area');
   if(CM==='heatmap'){if(ch){ch.destroy();ch=null;}area.innerHTML='<div style="overflow-x:auto;padding:4px 0">'+buildHeatmap(dmap)+'</div>';return;}
-  area.innerHTML='<canvas id="chart" height="130"></canvas>';
+  area.innerHTML='<canvas id="chart"></canvas>';
   if(ch){ch.destroy();ch=null;}
   var ctx=document.getElementById('chart').getContext('2d');
   if(CM==='daily'){
@@ -695,7 +702,7 @@ function renderTable(trades,filtCF){
     var pnl=parseFloat(t.closedPnl),side=t.side==='Sell'?'LONG':'SHORT',sym=(t.symbol||'').replace('USDT','');
     return '<tr class="'+(ex?'excl':'')+'"><td style="color:var(--t3)">'+(s+i+1)+'</td><td>'+date+'</td><td>'+sym+(t.note?' <span style="color:var(--t3);font-size:10px">'+t.note+'</span>':'')+'</td><td><span class="bdg '+side.toLowerCase()+(t.isManual?' manual':'')+'">'+side+(t.isManual?' \u270e':'')+'</span></td><td class="'+(pnl>=0?'pos':'neg')+'">'+f2(pnl)+'</td><td style="display:flex;gap:3px"><button class="btn sm" onclick="togX(\''+tid+'\')">'+(ex?'\u21a9':'\u2715')+'</button>'+(t.isManual?'<button class="btn sm" onclick="delM(\''+tid+'\')">&#x1f5d1;</button>':'')+'</td></tr>';
   }).join('');
-  document.getElementById('jtbl').innerHTML='<table class="ttbl"><thead><tr><th>#</th><th>\u0414\u0430\u0442\u0430</th><th>\u041f\u0430\u0440\u0430</th><th>\u0422\u0438\u043f</th><th>P&L</th><th>\u0417\u0430\u043c\u0435\u0442\u043a\u0430</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:16px">\u041d\u0435\u0442 \u0437\u0430\u043f\u0438\u0441\u0435\u0439</td></tr>')+'</tbody></table>';
+  document.getElementById('jtbl').innerHTML='<table class="ttbl"><thead><tr><th>#</th><th>\u0414\u0430\u0442\u0430</th><th>\u041f\u0430\u0440\u0430</th><th>\u0422\u0438\u043f</th><th>P&L</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:16px">\u041d\u0435\u0442 \u0437\u0430\u043f\u0438\u0441\u0435\u0439</td></tr>')+'</tbody></table>';
   var pag=document.getElementById('pgn');if(tp<=1){pag.innerHTML='';return;}
   var h='<span class="pi">'+(s+1)+'\u2013'+Math.min(s+PG,tot)+' \u0438\u0437 '+tot+'</span>';
   h+='<button class="pb" onclick="gp('+(pg-1)+')" '+(pg===1?'disabled':'')+'>\u2190</button>';
