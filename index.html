@@ -47,8 +47,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12
 .fld label{display:block;font-size:10px;color:var(--t3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.08em}
 .fld input{width:100%;background:var(--bg);border:1px solid var(--b);border-radius:5px;padding:5px 8px;color:var(--text);font-family:var(--mono);font-size:11px}
 .fld input:focus{outline:none;border-color:rgba(88,166,255,0.35)}
-.page-grid{display:grid;grid-template-columns:minmax(0,1fr) 190px minmax(0,1fr);gap:8px;margin-bottom:10px;align-items:start;grid-template-rows:auto 1fr auto}
-.page-left{display:flex;flex-direction:column;gap:8px;min-width:0;grid-row:1/3}
+.page-grid{display:grid;grid-template-columns:minmax(0,1fr) 260px 320px;gap:8px;margin-bottom:0;align-items:start}
+.page-left{display:flex;flex-direction:column;gap:8px;min-width:0}
 .page-right{display:flex;flex-direction:column;gap:8px}.page-right .card{flex:1;display:flex;flex-direction:column}.page-right .twrap{flex:1}
 .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .kpi{background:var(--c1);border:1px solid var(--b);border-radius:8px;padding:11px 13px}
@@ -73,7 +73,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12
 .lnum .ln{font-size:10px;color:var(--t3);margin-bottom:1px}
 .lnum .lv{font-family:var(--mono);font-size:11px;font-weight:500}
 .ls-hint{font-size:10px;color:var(--blue);margin-left:4px}
-.chart-card{flex:1}
+.chart-card{flex:1;min-height:300px}
 .card{background:var(--c1);border:1px solid var(--b);border-radius:8px;padding:11px 13px;transition:border-color .15s}
 .card:hover{border-color:var(--bh)}
 .ctitle{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
@@ -147,7 +147,7 @@ tr.excl td{opacity:.3;text-decoration:line-through}
 .pgtxt{font-size:10px;color:var(--t2);font-family:var(--mono);margin-bottom:3px}
 .pgbar{height:1px;background:var(--b);overflow:hidden}
 .pgfill{height:100%;background:var(--blue);transition:width .3s}
-@media(max-width:1300px){.kpi-row{grid-template-columns:repeat(5,1fr)}.page-grid{grid-template-columns:minmax(0,1fr) 190px minmax(0,1fr)}}
+@media(max-width:1300px){.kpi-row{grid-template-columns:repeat(5,1fr)}.page-grid{grid-template-columns:minmax(0,1fr) 240px 290px}}
 @media(max-width:800px){.kpi-row{grid-template-columns:repeat(2,1fr)}.page-grid{grid-template-columns:1fr}.ls-row{grid-template-columns:1fr}.main{padding:8px}}
 </style>
 </head>
@@ -244,7 +244,7 @@ tr.excl td{opacity:.3;text-decoration:line-through}
       <button class="ctgl" onclick="setCM('heatmap',this)">Календарь</button>
     </div>
   </div>
-  <div id="chart-area"><canvas id="chart" height="240"></canvas></div>
+  <div id="chart-area"><canvas id="chart"></canvas></div>
 </div>
 
 </div><!-- /page-left -->
@@ -253,7 +253,7 @@ tr.excl td{opacity:.3;text-decoration:line-through}
   <div id="stats"><div class="loading"><div class="spin"></div></div></div>
 </div>
 
-<div class="card" style="display:flex;flex-direction:column;align-self:stretch">
+<div class="card" style="display:flex;flex-direction:column">
   <div class="ctitle">
     Журнал <span id="jcnt" style="color:var(--t3)"></span>
     <div style="display:flex;gap:4px;align-items:center">
@@ -264,8 +264,9 @@ tr.excl td{opacity:.3;text-decoration:line-through}
   <div class="twrap" id="jtbl" style="flex:1;max-height:none"><div class="loading"><div class="spin"></div></div></div>
   <div class="pgn" id="pgn"></div>
 </div>
-<div style="grid-column:2/4;display:flex;gap:6px;flex-wrap:nowrap" id="ins-row"></div>
 </div><!-- /page-grid -->
+
+<div id="ins-row" style="display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:10px;overflow-x:hidden"></div>
 
 <div class="card" style="margin-bottom:10px">
   <div class="ctitle">
@@ -544,10 +545,6 @@ function render(trades,bal,allTrades){
     {l:'Риск / доход',v:avgLoss>0?(parseFloat(avgWin)/parseFloat(avgLoss)).toFixed(2):'\u221e',c:'blu',s:'win / loss'},
     {l:'Сделок в день',v:(tot&&days?(tot/days).toFixed(1):'—'),c:'',s:'среднее'}
   ];
-  document.getElementById('ins-row').innerHTML=ins.map(function(d){
-    return '<div class="ins-c"><div class="ins-lbl">'+d.l+'</div><div class="ins-val '+d.c+'">'+d.v+'</div><div class="ins-sub">'+d.s+'</div></div>';
-  }).join('')+cfExtra;
-
   // CF
   var depT=filtCF.filter(function(c){return c.type==='deposit';}).reduce(function(s,c){return s+c.amount;},0);
   var wdT=filtCF.filter(function(c){return c.type==='withdrawal';}).reduce(function(s,c){return s+c.amount;},0);
@@ -558,6 +555,9 @@ function render(trades,bal,allTrades){
       '<div class="ins-c"><div class="ins-lbl">Выводов</div><div class="ins-val neg">-$'+wdT.toFixed(2)+'</div><div class="ins-sub">&nbsp;</div></div>'+
       '<div class="ins-c"><div class="ins-lbl">Чистый поток</div><div class="ins-val '+(net>=0?'pos':'neg')+'">'+(net>=0?'+':'-')+'$'+Math.abs(net).toFixed(2)+'</div><div class="ins-sub">&nbsp;</div></div>';
   }
+  document.getElementById('ins-row').innerHTML=ins.map(function(d){
+    return '<div class="ins-c"><div class="ins-lbl">'+d.l+'</div><div class="ins-val '+d.c+'">'+d.v+'</div><div class="ins-sub">'+d.s+'</div></div>';
+  }).join('')+cfExtra;
 
   renderChart(cPnl,cCap,cPts,dmap);
   renderMonthly(allTrades,bal);
@@ -579,7 +579,7 @@ function renderChart(cPnl,cCap,cPts,dmap){
   if(CM==='daily'){
     var dates=Object.keys(dmap).sort(),vals=dates.map(function(d){return dmap[d];});
     ch=new Chart(ctx,{type:'bar',data:{labels:dates,datasets:[{data:vals,backgroundColor:vals.map(function(v){return v>=0?'rgba(57,217,138,0.6)':'rgba(248,81,73,0.6)';}),borderRadius:2,borderWidth:0}]},
-      options:{responsive:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'#21262d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#8b949e',bodyColor:'#e6edf3',callbacks:{label:function(c){return (c.parsed.y>=0?'+':'')+c.parsed.y.toFixed(2);}}}},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#21262d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#8b949e',bodyColor:'#e6edf3',callbacks:{label:function(c){return (c.parsed.y>=0?'+':'')+c.parsed.y.toFixed(2);}}}},
       scales:{x:{grid:{display:false},ticks:{color:'#484f58',font:{family:'JetBrains Mono',size:9},maxRotation:45}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#484f58',font:{family:'JetBrains Mono',size:10},callback:function(v){return (v>=0?'+':'')+v;}}}}}});
     return;
   }
@@ -596,7 +596,7 @@ function renderChart(cPnl,cCap,cPts,dmap){
       return parseFloat(pt.pnl||0)>=0?'rgba(57,217,138,.8)':'rgba(248,81,73,.8)';
     }),
     pointHoverRadius:4,fill:true,tension:0.3}]},
-    options:{responsive:true,interaction:{mode:'index',intersect:false},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
     plugins:{legend:{display:false},tooltip:{backgroundColor:'#21262d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#8b949e',bodyColor:'#e6edf3',titleFont:{family:'JetBrains Mono',size:10},bodyFont:{family:'JetBrains Mono',size:11},
     callbacks:{
       title:function(c){var i=c[0].dataIndex;if(i===0)return'\u0421\u0442\u0430\u0440\u0442';var pt=cPts[i-1];if(!pt)return'';if(pt.type)return pt.date;return pt.date+(pt.sym?' \u00b7 '+pt.sym:'');},
