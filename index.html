@@ -189,6 +189,7 @@ tr.excl td{opacity:.3;text-decoration:line-through}
     <div class="fld" style="max-width:120px"><label>Капитал ($)</label><input type="number" id="c-cap" placeholder="3000"></div>
     <div class="fld" style="max-width:100px"><label>Цель/мес (%)</label><input type="number" id="c-rate" placeholder="20"></div>
     <button class="btn pr" onclick="saveCfg()">Сохранить</button>
+    <button class="btn" onclick="fullSync()" title="Очистить кэш и загрузить всё заново">⟳ Полная синхронизация</button>
   </div>
 </div>
 <div class="setup" id="setup" style="display:none">
@@ -421,12 +422,23 @@ function applyFilt(items){
 async function apiCall(ep,params){
   var u=new URL(WU);u.searchParams.set('endpoint',ep);
   Object.entries(params||{}).forEach(function(kv){u.searchParams.set(kv[0],kv[1]);});
-  var r=await fetch(u.toString());if(!r.ok)throw new Error('HTTP '+r.status);return r.json();
+  var lastE=null;
+  for(var a=0;a<3;a++){
+    try{
+      var r=await fetch(u.toString());
+      if(!r.ok){
+        var b='';try{b=await r.text();}catch(e2){}
+        throw new Error('HTTP '+r.status+(b?' \u2014 '+b.slice(0,160):''));
+      }
+      return await r.json();
+    }catch(err){lastE=err;if(a<2)await new Promise(function(rs){setTimeout(rs,600*(a+1));});}
+  }
+  throw lastE;
 }
 function setPg(p,t){document.getElementById('pgfill').style.width=p+'%';document.getElementById('pgtxt').textContent=t;}
 
-async function fetchAll(){
-  var all=new Map(),ys=new Date('2026-01-01T00:00:00Z').getTime(),W=7*24*3600*1000;
+async function fetchAll(since){
+  var all=new Map(),ys=Math.max(since||0,new Date('2026-01-01T00:00:00Z').getTime()),W=7*24*3600*1000;
   var lastErr=null,errCnt=0;
   var chunks=[];for(var s=ys;s<Date.now();s+=W)chunks.push({s:s,e:Math.min(s+W-1,Date.now())});
   for(var i=0;i<chunks.length;i++){
@@ -444,13 +456,13 @@ async function fetchAll(){
       if(!cur||l.length<100)break;
       await new Promise(function(r){setTimeout(r,50);});
     }
-    await new Promise(function(r){setTimeout(r,80);});
+    await new Promise(function(r){setTimeout(r,150);});
   }
   setPg(100,'Загружено '+all.size+' сделок');return {list:[...all.values()],err:lastErr,errCnt:errCnt};
 }
 
-async function fetchCF(){
-  var out=[],ys=new Date('2026-01-01T00:00:00Z').getTime(),W=29*86400000;
+async function fetchCF(since){
+  var out=[],ys=Math.max(since||0,new Date('2026-01-01T00:00:00Z').getTime()),W=29*86400000;
   for(var s=ys;s<Date.now();s+=W){
     var e=Math.min(s+W-1,Date.now());
     // Депозиты (on-chain)
@@ -489,7 +501,7 @@ async function fetchCF(){
         await new Promise(function(r){setTimeout(r,50);});
       }
     }catch(err){console.error('withdraw fetch fail:',err);}
-    await new Promise(function(r){setTimeout(r,60);});
+    await new Promise(function(r){setTimeout(r,150);});
   }
   var m=new Map();out.forEach(function(c){m.set(c.id,c);});
   return [...m.values()];
@@ -499,25 +511,57 @@ async function loadData(){
   if(!WU){document.getElementById('setup').style.display='block';return;}
   document.getElementById('pgwrap').style.display='block';
   var eb=document.getElementById('apierr');eb.style.display='none';
+  // кэш из прошлых загрузок
+  var cacheT=[],cacheC=[],lastSync=0;
   try{
-    var res=await fetchAll();
-    bybit=res.list;
+    cacheT=JSON.parse(localStorage.getItem('cache_t')||'[]');
+    cacheC=JSON.parse(localStorage.getItem('cache_c')||'[]');
+    lastSync=parseInt(localStorage.getItem('cache_ts')||'0');
+  }catch(e){cacheT=[];cacheC=[];lastSync=0;}
+  var since=lastSync?lastSync-3*86400000:0; // перекрытие 3 дня на случай поздних обновлений
+  try{
+    var res=await fetchAll(since);
+    var m=new Map();
+    cacheT.forEach(function(t){m.set(t.orderId||(t.symbol+t.updatedTime),t);});
+    res.list.forEach(function(t){m.set(t.orderId||(t.symbol+t.updatedTime),t);});
+    bybit=[...m.values()];
     try{var w=await apiCall('/v5/account/wallet-balance',{accountType:'UNIFIED'});if(w.retCode===0)wbal=parseFloat(w.result.list[0]&&w.result.list[0].totalEquity||0);}catch(e){console.error('wallet fail:',e);}
     setPg(100,'Загрузка депозитов и выводов...');
-    try{autoCF=await fetchCF();}catch(e){console.error('cashflow fetch fail:',e);autoCF=[];}
+    var newCF=[];
+    try{newCF=await fetchCF(since);}catch(e){console.error('cashflow fetch fail:',e);}
+    var mc=new Map();
+    cacheC.forEach(function(c){mc.set(c.id,c);});
+    newCF.forEach(function(c){mc.set(c.id,c);});
+    autoCF=[...mc.values()];
+    // сохраняем кэш; метку времени двигаем только при успешной загрузке
+    try{
+      localStorage.setItem('cache_t',JSON.stringify(bybit));
+      localStorage.setItem('cache_c',JSON.stringify(autoCF));
+      if(!res.err)localStorage.setItem('cache_ts',String(Date.now()));
+    }catch(e){console.error('cache save fail:',e);}
     document.getElementById('pgwrap').style.display='none';
     if(res.err){
       eb.innerHTML='⚠ Ошибка загрузки с Bybit ('+res.errCnt+' запросов не прошло): <b>'+res.err+'</b><br>'+
-        '<span style="color:var(--t2)">Проверь: 1) Worker URL в настройках (⚙) — открой его в браузере напрямую; 2) не истёк ли API-ключ Bybit в коде Worker; 3) консоль браузера (F12) для деталей. Загружено сделок: '+bybit.length+'</span>';
+        '<span style="color:var(--t2)">Если это HTTP 429/500 — скорее всего, Bybit временно ограничил запросы (rate limit), подожди 1–2 минуты и нажми ↻. Показаны данные из кэша ('+bybit.length+' сделок). Полная перезагрузка — в настройках (⚙).</span>';
       eb.style.display='block';
     }
     rerender();
     document.getElementById('ts').textContent=new Date().toLocaleTimeString('ru');
   }catch(e){
     document.getElementById('pgwrap').style.display='none';
-    eb.innerHTML='⚠ Ошибка: '+e.message;eb.style.display='block';
+    bybit=cacheT;autoCF=cacheC;
+    eb.innerHTML='⚠ Ошибка: '+e.message+'<br><span style="color:var(--t2)">Показаны данные из кэша ('+bybit.length+' сделок).</span>';
+    eb.style.display='block';
     rerender();
   }
+}
+
+function fullSync(){
+  localStorage.removeItem('cache_t');
+  localStorage.removeItem('cache_c');
+  localStorage.removeItem('cache_ts');
+  document.getElementById('cfg').classList.remove('show');
+  loadData();
 }
 
 function rerender(){render(applyFilt([].concat(bybit,manuals)),wbal,[].concat(bybit,manuals));}
