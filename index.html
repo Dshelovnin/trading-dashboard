@@ -200,6 +200,7 @@ tr.excl td{opacity:.3;text-decoration:line-through}
   <div class="pgtxt" id="pgtxt">Загрузка...</div>
   <div class="pgbar"><div class="pgfill" id="pgfill" style="width:0%"></div></div>
 </div>
+<div class="errbox" id="apierr" style="display:none;margin-bottom:10px"></div>
 
 <div class="page-grid">
 <div class="page-left">
@@ -339,6 +340,8 @@ function toggleCfg(){
 }
 function saveCfg(){
   WU=document.getElementById('c-url').value.trim().replace(/\/$/,'');
+  if(WU&&!/^https?:\/\//i.test(WU))WU='https://'+WU;
+  if(WU){try{new URL(WU);}catch(e){alert('Некорректный URL: '+WU);return;}}
   CAP=parseFloat(document.getElementById('c-cap').value)||3000;
   RATE=(parseFloat(document.getElementById('c-rate').value)||20)/100;
   localStorage.setItem('wu',WU);localStorage.setItem('cap',String(CAP));localStorage.setItem('rate',String(Math.round(RATE*100)));
@@ -423,6 +426,7 @@ function setPg(p,t){document.getElementById('pgfill').style.width=p+'%';document
 
 async function fetchAll(){
   var all=new Map(),ys=new Date('2026-01-01T00:00:00Z').getTime(),W=7*24*3600*1000;
+  var lastErr=null,errCnt=0;
   var chunks=[];for(var s=ys;s<Date.now();s+=W)chunks.push({s:s,e:Math.min(s+W-1,Date.now())});
   for(var i=0;i<chunks.length;i++){
     var ch2=chunks[i];
@@ -431,8 +435,8 @@ async function fetchAll(){
     while(pn<15){
       var p={category:'linear',limit:100,startTime:String(ch2.s),endTime:String(ch2.e)};
       if(cur)p.cursor=cur;
-      var d;try{d=await apiCall('/v5/position/closed-pnl',p);}catch(err){break;}
-      if(d.retCode!==0)break;
+      var d;try{d=await apiCall('/v5/position/closed-pnl',p);}catch(err){lastErr=err.message;errCnt++;console.error('fetch chunk fail:',err);break;}
+      if(d.retCode!==0){lastErr='Bybit API: '+(d.retMsg||'код '+d.retCode);errCnt++;console.error('bybit retCode',d.retCode,d.retMsg);break;}
       var l=d.result&&d.result.list||[];
       l.forEach(function(t){all.set(t.orderId||(t.symbol+t.updatedTime),t);});
       cur=d.result&&d.result.nextPageCursor||'';pn++;
@@ -441,21 +445,29 @@ async function fetchAll(){
     }
     await new Promise(function(r){setTimeout(r,80);});
   }
-  setPg(100,'Загружено '+all.size+' сделок');return [...all.values()];
+  setPg(100,'Загружено '+all.size+' сделок');return {list:[...all.values()],err:lastErr,errCnt:errCnt};
 }
 
 async function loadData(){
   if(!WU){document.getElementById('setup').style.display='block';return;}
   document.getElementById('pgwrap').style.display='block';
+  var eb=document.getElementById('apierr');eb.style.display='none';
   try{
-    bybit=await fetchAll();
-    try{var w=await apiCall('/v5/account/wallet-balance',{accountType:'UNIFIED'});if(w.retCode===0)wbal=parseFloat(w.result.list[0]&&w.result.list[0].totalEquity||0);}catch(e){}
+    var res=await fetchAll();
+    bybit=res.list;
+    try{var w=await apiCall('/v5/account/wallet-balance',{accountType:'UNIFIED'});if(w.retCode===0)wbal=parseFloat(w.result.list[0]&&w.result.list[0].totalEquity||0);}catch(e){console.error('wallet fail:',e);}
     document.getElementById('pgwrap').style.display='none';
+    if(res.err){
+      eb.innerHTML='⚠ Ошибка загрузки с Bybit ('+res.errCnt+' запросов не прошло): <b>'+res.err+'</b><br>'+
+        '<span style="color:var(--t2)">Проверь: 1) Worker URL в настройках (⚙) — открой его в браузере напрямую; 2) не истёк ли API-ключ Bybit в коде Worker; 3) консоль браузера (F12) для деталей. Загружено сделок: '+bybit.length+'</span>';
+      eb.style.display='block';
+    }
     rerender();
     document.getElementById('ts').textContent=new Date().toLocaleTimeString('ru');
   }catch(e){
     document.getElementById('pgwrap').style.display='none';
-    document.getElementById('jtbl').innerHTML='<div class="errbox">Ошибка: '+e.message+'</div>';
+    eb.innerHTML='⚠ Ошибка: '+e.message;eb.style.display='block';
+    rerender();
   }
 }
 
