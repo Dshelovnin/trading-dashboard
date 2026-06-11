@@ -52,7 +52,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12
 .page-mid{display:flex;flex-direction:column;gap:8px;min-width:0}
 .page-right{display:flex;flex-direction:column;gap:8px}.page-right .card{flex:1;display:flex;flex-direction:column}.page-right .twrap{flex:1}
 .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.kpi{background:var(--c1);border:1px solid var(--b);border-radius:8px;padding:11px 13px}
+.kpi{background:var(--c1);border:1px solid var(--b);border-radius:8px;padding:11px 13px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:86px}
 .kpi.ab{background:rgba(88,166,255,0.06);border-color:rgba(88,166,255,0.2)}
 .kpi.am{background:rgba(57,217,138,0.06);border-color:rgba(57,217,138,0.2)}
 .kpi.ar{background:rgba(248,81,73,0.06);border-color:rgba(248,81,73,0.2)}
@@ -747,12 +747,21 @@ function renderMonthly(allT,bal){
     var k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
     byM[k]=(byM[k]||0)+parseFloat(t.closedPnl);
   });
+  // Депозиты/выводы по месяцам
+  var byF={};
+  allCFitems().forEach(function(c){
+    var d=new Date(c.ts);
+    var k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    byF[k]=(byF[k]||0)+(c.type==='deposit'?c.amount:-c.amount);
+  });
   var now=new Date(),ck=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
   var pc=CAP,rows='';
   for(var m=1;m<=12;m++){
     var k='2026-'+String(m).padStart(2,'0');
     var mn=new Date(2026,m-1,1).toLocaleString('ru',{month:'long'});
-    var pp=pc*RATE,pe=pc*(1+RATE),fact=byM[k],has=fact!==undefined;
+    var pp=pc*RATE,pe=pc*(1+RATE);
+    var has=byM[k]!==undefined||byF[k]!==undefined;
+    var fact=has?((byM[k]||0)+(byF[k]||0)):undefined;
     var st='',fc='—',dc='—',fec='—';var isc=k===ck,isp=k<ck;
     if(isp){
       if(has){var dv=fact-pp,dp=(dv/pp*100).toFixed(1);fc='<span class="'+(fact>=0?'pos':'neg')+'">'+f2(fact)+'</span>';dc='<span class="'+(dv>=0?'pos':'neg')+'">'+f2(dv)+' ('+(dv>=0?'+':'')+dp+'%)</span>';fec=fu(pc+fact);st=fact>=pp?'<span class="tag tok">\u2713 \u0412\u044b\u043f.':'<span class="tag tbad">\u2717 \u041d\u0435\u0442';}
